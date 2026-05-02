@@ -1,7 +1,9 @@
-# gameplay py
+# gamplay py
+from character import Rogue, Warrior, Knight
+
 def start_game():
-    print("\n=== Starting New Game ===")
-    print("Choose your character class:")
+    print("\n=== Character Selection ===")
+    print("Choose your character: ")
     print("1. Rogue")
     print("2. Warrior")
     print("3. Knight")
@@ -9,13 +11,37 @@ def start_game():
     choice = input("Enter your choice: ").strip()
 
     if choice == "1":
-        print("You chose Rogue. Let the adventure begin!")
+        player = Rogue("You've choose as a Rogue, a nimble and stealthy character with agility and cunning.")
     elif choice == "2":
-        print("You chose Warrior. Let the adventure begin!")
+        player = Warrior("You've choose as a Warrior, a strong and resilient character with high health and powerful attacks.")
     elif choice == "3":
-        print("You chose Knight. Let the adventure begin!")
+        player = Knight("You've choose as a Knight, a heavily armoured character with balanced stats and strong defense.")
     else:
-        print("Invalid choice. Starting with default character (Rogue)>")
-        print("You chose Rogue. Let the adventure begin!")
+        print("Invalid choice. You will be assigned as a Rogue by default.")
+        player = Rogue("You've choose as a Rogue, a nimble and stealthy character with agility and cunning.")
 
-    # Later you can expand this into the full game loop
+    print(f"\nYou have chosen {player.name}. Let the adventure begin!")
+
+    # Enter gameplay loop
+    run_game_loop(player)
+
+def run_game_loop(player):
+    while True:
+        print("\n=== Gameplay Menu ===")
+        print("1. Explore")
+        print("2. Check Inventory")
+        print("3. Return to main menu")
+
+        action = input("Enter your action: ").strip()
+
+        if action == "1":
+            print(f"{player.name} explores the dungeon... (placeholder)")
+            # later call dungeo logic
+        elif action == "2":
+            print(f"{player.name} checks inventory... (placeholder)")
+        elif action == "3":
+            print("Returning to main menu...")
+            break
+        else:
+            print("Invalid choice. Please try again.")
+            
