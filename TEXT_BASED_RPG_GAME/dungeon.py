@@ -6,6 +6,7 @@ from combat import TurnBasedCombat
 
 
 def explore_dungeon(player):
+    
     print("\n=== Dungeon Exploration ===")
 
     paths = ["Left", "Center", "Right"]
@@ -30,6 +31,7 @@ def explore_dungeon(player):
 
 def encounter(player):
     roll = random.random()
+    print("DEBUG: encounter function started")
 
     # 40% chance → enemy
     if roll < 0.4:
@@ -38,15 +40,19 @@ def encounter(player):
         enemy = OrdinaryEnemy("Goblin", level=1)
 
         combat = TurnBasedCombat(player, enemy)
-        combat.start_combat()
+        result = combat.start_combat()
+        if result == "menu":
+            return
 
     # 30% chance → random event
     elif roll < 0.7:
         print("\nA random event occurs!")
+        print("DEBUG: before trigger_event")
 
         event_system = RandomEvents()
         event_system.trigger_event(player)
 
+        print("DEBUG: after trigger_event")
     # 30% chance → nothing
     else:
         print("\nThe area is quiet... nothing happens.")

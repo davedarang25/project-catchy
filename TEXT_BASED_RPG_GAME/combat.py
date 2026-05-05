@@ -17,7 +17,7 @@ class TurnBasedCombat:
             else:
                 self.enemy_turn()
 
-        self.end_combat()
+        return self.end_combat()
 
     def check_hit(self, attacker, defender):
         base_hit_chance = 0.75
@@ -114,3 +114,5 @@ class TurnBasedCombat:
 
         else:
             print("\nYou were defeated. Game Over.")
+            input("\nPress Enter to return to the main menu...")
+            return "menu"

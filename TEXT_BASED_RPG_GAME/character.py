@@ -8,7 +8,6 @@ class Character:
         self.max_hp = maxHp if maxHp is not None else hp
         self.attack = attack
         self.defense = defense
-        #self.inventory = Inventory()   # <-- add inventory here # <-- edit out for enemy to inherit, I moved it in player
 
     def is_alive(self):
         return self.hp > 0

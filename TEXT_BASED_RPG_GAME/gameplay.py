@@ -42,6 +42,8 @@ def run_game_loop(player):
 
         if action == "1":
             explore_dungeon(player)
+            if not player.is_alive():
+                return
         elif action == "2":
             open_inventory(player)
         elif action == "3":
