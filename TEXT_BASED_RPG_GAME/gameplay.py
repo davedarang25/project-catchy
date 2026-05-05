@@ -1,5 +1,5 @@
 # gameplay.py
-from character import Rogue, Warrior, Knight
+from player import Rogue, Warrior, Knight
 from inventory import Inventory
 from dungeon import explore_dungeon
 from item import HealingItem

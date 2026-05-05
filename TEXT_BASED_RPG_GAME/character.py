@@ -1,5 +1,4 @@
 # character.py
-from inventory import Inventory
 
 class Character:
     def __init__(self, name, hp=100, attack=10, defense=5):
@@ -8,7 +7,7 @@ class Character:
         self.maxHp = hp
         self.attack = attack
         self.defense = defense
-        self.inventory = Inventory()   # <-- add inventory here
+        #self.inventory = Inventory()   # <-- add inventory here # <-- edit out for enemy to inherit, I moved it in player
 
     def is_alive(self):
         return self.hp > 0
@@ -22,7 +21,7 @@ class Character:
         return f"{self.name} | HP: {self.hp}/{self.maxHp} | ATK: {self.attack} | DEF: {self.defense}"
 
 
-class Rogue(Character):
+"""class Rogue(player):
     def __init__(self, name="Rogue"):
         super().__init__(name, hp=80, attack=15, defense=3)
         self.crit_rate = 0.2
@@ -40,4 +39,4 @@ class Knight(Character):
     def __init__(self, name="Knight"):
         super().__init__(name, hp=150, attack=10, defense=12)
         self.shield_block = 0.25
-        self.endurance = 10
+        self.endurance = 10""" #<--- moved out to player
