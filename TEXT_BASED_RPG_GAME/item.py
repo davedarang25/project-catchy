@@ -48,9 +48,3 @@ class HealingItem(Item):
     def __init__(self, id, name, description, healAmount):
         super().__init__(id, name, description, "Consumable")
         self.healAmount = healAmount
-
-    def use(self, user):
-        user.hp += self.healAmount
-        if user.hp > user.maxHp:
-            user.hp = user.maxHp
-        print(f"{user.name} healed for {self.healAmount}. Current HP: {user.hp}")

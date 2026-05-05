@@ -1,6 +1,8 @@
 # gameplay.py
 from character import Rogue, Warrior, Knight
 from inventory import Inventory
+from dungeon import explore_dungeon
+from item import HealingItem
 
 def start_game():
     print("\n=== Character Selection ===")
@@ -22,6 +24,10 @@ def start_game():
 
     print(f"\nYou have chosen {player.name}. Let the adventure begin!")
 
+    # Starter potion with correct constructor call
+    starter_potion = HealingItem(1, "Healing Potion", "Restores 50 HP", 50)
+    player.inventory.add_item(starter_potion)
+
     run_game_loop(player)
 
 
@@ -35,7 +41,7 @@ def run_game_loop(player):
         action = input("Choose an action: ").strip()
 
         if action == "1":
-            print(f"{player.name} explores the dungeon... (placeholder)")
+            explore_dungeon(player)
         elif action == "2":
             open_inventory(player)
         elif action == "3":
@@ -43,7 +49,6 @@ def run_game_loop(player):
             break
         else:
             print("Invalid choice. Try again.")
-
 
 def open_inventory(player):
     while True:
@@ -70,3 +75,4 @@ def open_inventory(player):
             break
         else:
             print("Invalid choice. Try again.")
+

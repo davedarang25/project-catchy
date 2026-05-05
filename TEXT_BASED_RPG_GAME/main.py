@@ -3,6 +3,8 @@ import sys
 from menu import show_menu
 from gameplay import start_game
 from leaderboard import show_leaderboard
+from character import Character
+
 
 def main():
     print("=== Welcome to the Exiled Below RPG Game ===")
@@ -29,3 +31,13 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+    # --- Test Inventory Access ---
+    from character import Warrior
+    from item import HealingItem
+
+    player = Warrior("Test Warrior")
+    potion = HealingItem(1, "Health Potion", "Restores 50 HP", 50)
+
+    player.inventory.add_item(potion)
+    player.inventory.show_items()
