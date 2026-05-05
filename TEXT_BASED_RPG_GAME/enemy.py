@@ -1,3 +1,5 @@
+from character import Character
+#Enemy.py 
 class Enemy(Character):
     def __init__(self, name, level, hp, max_hp, attack, defense, exp_reward, gold_reward, enemy_type):
         super().__init__(name, level, hp, max_hp, attack, defense)

@@ -1,10 +1,11 @@
 # character.py
 
 class Character:
-    def __init__(self, name, hp=100, attack=10, defense=5):
+    def __init__(self, name, level=1, hp=100, maxHp=None, attack=10, defense=5):
         self.name = name
+        self.level = level
         self.hp = hp
-        self.maxHp = hp
+        self.max_hp = maxHp if maxHp is not None else hp
         self.attack = attack
         self.defense = defense
         #self.inventory = Inventory()   # <-- add inventory here # <-- edit out for enemy to inherit, I moved it in player
@@ -18,7 +19,7 @@ class Character:
             self.hp = 0
 
     def get_info(self):
-        return f"{self.name} | HP: {self.hp}/{self.maxHp} | ATK: {self.attack} | DEF: {self.defense}"
+        return f"{self.name} | HP: {self.hp}/{self.max_hp} | ATK: {self.attack} | DEF: {self.defense}"
 
 
 """class Rogue(player):
