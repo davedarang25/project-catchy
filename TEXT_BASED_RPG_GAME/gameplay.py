@@ -1,47 +1,72 @@
-# gamplay py
+# gameplay.py
 from character import Rogue, Warrior, Knight
+from inventory import Inventory
 
 def start_game():
     print("\n=== Character Selection ===")
-    print("Choose your character: ")
     print("1. Rogue")
     print("2. Warrior")
     print("3. Knight")
 
-    choice = input("Enter your choice: ").strip()
+    choice = input("Choose your class: ").strip()
 
     if choice == "1":
-        player = Rogue("You've choose as a Rogue, a nimble and stealthy character with agility and cunning.")
+        player = Rogue("Rogue")
     elif choice == "2":
-        player = Warrior("You've choose as a Warrior, a strong and resilient character with high health and powerful attacks.")
+        player = Warrior("Warrior")
     elif choice == "3":
-        player = Knight("You've choose as a Knight, a heavily armoured character with balanced stats and strong defense.")
+        player = Knight("Knight")
     else:
-        print("Invalid choice. You will be assigned as a Rogue by default.")
-        player = Rogue("You've choose as a Rogue, a nimble and stealthy character with agility and cunning.")
+        print("Invalid choice. Defaulting to Rogue.")
+        player = Rogue("Rogue")
 
     print(f"\nYou have chosen {player.name}. Let the adventure begin!")
 
-    # Enter gameplay loop
     run_game_loop(player)
+
 
 def run_game_loop(player):
     while True:
         print("\n=== Gameplay Menu ===")
-        print("1. Explore")
+        print("1. Explore Dungeon")
         print("2. Check Inventory")
-        print("3. Return to main menu")
+        print("3. Return to Main Menu")
 
-        action = input("Enter your action: ").strip()
+        action = input("Choose an action: ").strip()
 
         if action == "1":
             print(f"{player.name} explores the dungeon... (placeholder)")
-            # later call dungeo logic
         elif action == "2":
-            print(f"{player.name} checks inventory... (placeholder)")
+            open_inventory(player)
         elif action == "3":
-            print("Returning to main menu...")
+            print("Returning to Main Menu...")
             break
         else:
-            print("Invalid choice. Please try again.")
-            
+            print("Invalid choice. Try again.")
+
+
+def open_inventory(player):
+    while True:
+        print("\n=== Inventory Menu ===")
+        player.inventory.show_items()
+        print("Options: ")
+        print("1. Use Item")
+        print("2. Exit Inventory")
+
+        choice = input("Choose an option: ").strip()
+
+        if choice == "1":
+            if player.inventory.is_empty():
+                print("No items to use.")
+            else:
+                item_index = int(input("Enter item number: ")) - 1
+                if 0 <= item_index < len(player.inventory.items):
+                    item = player.inventory.items[item_index]
+                    player.inventory.use_item(item, player)
+                else:
+                    print("Invalid item number.")
+        elif choice == "2":
+            print("Exiting Inventory...")
+            break
+        else:
+            print("Invalid choice. Try again.")
