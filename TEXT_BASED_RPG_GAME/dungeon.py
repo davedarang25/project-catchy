@@ -52,29 +52,44 @@ def encounter(player):
         print("\nThe area is quiet... nothing happens.")
 
 
-"""# dungeon.py
-import random
+"""import random
+
+ALL_PATHS = ["Left", "Center", "Right"]
 
 def explore_dungeon(player):
-    print("\n=== Dungeo Exploration ===")
-    paths = ["Left", "Center", "Right"]
-    random.shuffle(paths)
+    print("\n=== Dungeon Exploration ===")
+
+    # Randomly decide which paths are available (1–3)
+    available_count = random.randint(1, 3)
+    available_paths = random.sample(ALL_PATHS, k=available_count)
+
+    # Fixed display order
+    fixed_menu = {
+        "1": "Left",
+        "2": "Center",
+        "3": "Right"
+    }
 
     print("Available paths:")
-    for idx, path in enumerate(paths, start=1):
-        print(f"{idx}. {path}")
+    for num, path in fixed_menu.items():
+        status = "OPEN" if path in available_paths else "BLOCKED"
+        print(f"{num}. {path} [{status}]")
 
-    choice = input("Choose a path to explore (1-3): ").strip()
+    choice = input("Choose a path (1-3): ").strip()
 
-    if choice in ["1", "2", "3"]:
-        chosen_path = paths[int(choice) - 1]
-        print(f"{player.name} takes the chosen {chosen_path} path...")
-        # Placeholder: encounter logic
-        encounter(player)
-    else:
-        print("Invalid choice. Returning to gameplay menu.")    
+    if choice not in fixed_menu:
+        print("Invalid input. You remain in the dungeon.")
+        return
+
+    chosen_path = fixed_menu[choice]
+
+    if chosen_path not in available_paths:
+        print("The path is blocked. You return to your current position.")
+        return
+
+    print(f"{player.name} takes the {chosen_path} path...")
+    encounter(player)
+
 
 def encounter(player):
-    # Placeholder for encounter logic
-    print(f"{player.name} encounters a mysterious enemy (combat placeholder).")
-    # Call combat(player) here when implemented later"""
+    print(f"{player.name} encounters a mysterious enemy (combat placeholder).")"""
