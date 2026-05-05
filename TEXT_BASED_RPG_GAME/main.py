@@ -3,7 +3,7 @@ import sys
 from menu import show_menu
 from gameplay import start_game
 from leaderboard import show_leaderboard
-from character import Character
+from player import Character
 
 
 def main():
