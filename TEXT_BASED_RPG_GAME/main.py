@@ -5,7 +5,7 @@ from gameplay import start_game
 from leaderboard import show_leaderboard
 
 def main():
-    print("=== Welcome to the Dungeon RPG ===")
+    print("=== Welcome to the Exiled Below RPG Game ===")
 
     while True:
         choice = show_menu()
