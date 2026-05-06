@@ -37,7 +37,11 @@ def encounter(player):
     if roll < 0.4:
         print("\nAn enemy appears!")
 
-        enemy = OrdinaryEnemy("Goblin", level=1)
+        # --- NEW ENEMY SPAWN LOGIC ---
+        enemy_classes = [Slime, Goblin, Skeleton]
+        chosen_class = random.choice(enemy_classes)
+        enemy = chosen_class(level=1)  # Instantiates a random level 1 enemy
+        # -----------------------------
 
         combat = TurnBasedCombat(player, enemy)
         result = combat.start_combat()
@@ -56,6 +60,28 @@ def encounter(player):
     # 30% chance → nothing
     else:
         print("\nThe area is quiet... nothing happens.")
+
+class Slime(OrdinaryEnemy):
+    def __init__(self, level=1):
+        super().__init__(name="Slime", level=level)
+        # Slimes are tanky but hit softly
+        self.hp += 15
+        self.max_hp += 15
+        self.attack = max(1, self.attack - 2) 
+
+class Goblin(OrdinaryEnemy):
+    def __init__(self, level=1):
+        super().__init__(name="Goblin", level=level)
+        # Goblins are balanced, but drop slightly more gold
+        self.gold_reward += 5
+
+class Skeleton(OrdinaryEnemy):
+    def __init__(self, level=1):
+        super().__init__(name="Skeleton", level=level)
+        # Skeletons hit hard but are fragile (glass cannons)
+        self.attack += 4
+        self.hp -= 10
+        self.max_hp -= 10
 
 
 """import random

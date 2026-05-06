@@ -80,3 +80,27 @@ class BossEnemy(Enemy):
             damage = max(1, self.attack - target.defense)
             target.take_damage(damage)
             print(f"{self.name} attacks {target.name} for {damage} damage!")
+
+
+# --- enemy entity ---
+class Slime(OrdinaryEnemy):
+    def __init__(self, level=1):
+        super().__init__(name="Slime", level=level)
+        # Slimes are tanky but hit softly
+        self.hp += 15
+        self.max_hp += 15
+        self.attack = max(1, self.attack - 2) 
+
+class Goblin(OrdinaryEnemy):
+    def __init__(self, level=1):
+        super().__init__(name="Goblin", level=level)
+        # Goblins are balanced, but drop slightly more gold
+        self.gold_reward += 5
+
+class Skeleton(OrdinaryEnemy):
+    def __init__(self, level=1):
+        super().__init__(name="Skeleton", level=level)
+        # Skeletons hit hard but are fragile (glass cannons)
+        self.attack += 4
+        self.hp -= 10
+        self.max_hp -= 10
