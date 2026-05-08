@@ -1,3 +1,4 @@
+from .utils import clear_screen
 # leaderboard.py
 
 # For now, we'll just use a simple list to simulate scores.
@@ -5,6 +6,7 @@
 scores = []
 
 def show_leaderboard():
+    clear_screen()
     print("\n=== Leaderboard ===")
 
     if not scores:

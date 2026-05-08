@@ -1,8 +1,8 @@
 import sys
-
-from menu import show_menu
-from gameplay import start_game
-from leaderboard import show_leaderboard
+from .menu import show_menu
+from .gameplay import start_game
+from .leaderboard import show_leaderboard
+from .utils import clear_screen
 
 
 def main():
@@ -10,7 +10,7 @@ def main():
     print("=== Welcome to the Exiled Below RPG Game ===")
 
     while True:
-
+        clear_screen()
         choice = show_menu()
 
         if choice == "1":

@@ -1,4 +1,9 @@
+# combat.py
 import random
+from .logger import Logger
+from .utils import clear_screen
+
+logger = Logger(delay=0.02)
 
 
 class TurnBasedCombat:
@@ -14,7 +19,7 @@ class TurnBasedCombat:
 
     def start_combat(self):
 
-        print(f"\nA {self.enemy.name} appears!")
+        logger.typewriter(f"\nA {self.enemy.name} appears!")
 
         while not self.check_combat_end():
 
@@ -62,7 +67,7 @@ class TurnBasedCombat:
         print("3. Defend")
 
         choice = input("Enter choice: ").strip()
-
+        clear_screen()
         if choice == "1":
 
             if self.check_hit(self.player, self.enemy):
@@ -75,7 +80,7 @@ class TurnBasedCombat:
 
                 self.enemy.take_damage(damage)
 
-                print(
+                logger.typewriter(
                     f"{self.player.name} hit "
                     f"{self.enemy.name} for "
                     f"{damage} damage!"
@@ -83,7 +88,7 @@ class TurnBasedCombat:
 
             else:
 
-                print(f"{self.player.name}'s attack missed!")
+                logger.typewriter(f"{self.player.name}'s attack missed!")
 
             self.enemy_guard = False
 
@@ -95,14 +100,14 @@ class TurnBasedCombat:
 
             self.player_guard = True
 
-            print(
+            logger.typewriter(
                 f"{self.player.name} defends "
                 f"and reduces incoming damage."
             )
 
         else:
 
-            print("Invalid choice. Turn skipped.")
+            logger.typewriter("Invalid choice. Turn skipped.")
 
         self.current_turn = "Enemy"
 
@@ -116,7 +121,7 @@ class TurnBasedCombat:
 
             self.enemy_guard = True
 
-            print(
+            logger.typewriter(
                 f"{self.enemy.name} defends "
                 f"and prepares for your next attack."
             )
@@ -133,7 +138,7 @@ class TurnBasedCombat:
 
                 self.player.take_damage(damage)
 
-                print(
+                logger.typewriter(
                     f"{self.enemy.name} hit "
                     f"{self.player.name} for "
                     f"{damage} damage!"
@@ -141,7 +146,7 @@ class TurnBasedCombat:
 
             else:
 
-                print(f"{self.enemy.name}'s attack missed!")
+                logger.typewriter(f"{self.enemy.name}'s attack missed!")
 
             self.player_guard = False
 
@@ -156,7 +161,7 @@ class TurnBasedCombat:
 
         if not consumables:
 
-            print("No usable items.")
+            logger.typewriter("No usable items.")
             return
 
         print("\n=== Consumables ===")
@@ -171,7 +176,7 @@ class TurnBasedCombat:
             choice = int(input("Choose item number: "))
 
             if choice == len(consumables) + 1:
-                print("Cancelled.")
+                logger.typewriter("Cancelled.")
                 return
 
             item = consumables[choice - 1]
@@ -179,9 +184,11 @@ class TurnBasedCombat:
             item.use(self.player)
             self.player.inventory.remove_item(item)
 
+            logger.typewriter(f"{self.player.name} used {item.name}.")
+
         except (ValueError, IndexError):
 
-            print("Invalid item choice.")
+            logger.typewriter("Invalid item choice.")
 
     def check_combat_end(self):
 
@@ -205,8 +212,10 @@ class TurnBasedCombat:
             self.player.attack += 3
             self.player.defense += 2
 
-            print("\nLEVEL UP!")
-            print(f"{self.player.name} is now level {self.player.level}!")
+            logger.typewriter("\nLEVEL UP!")
+            logger.typewriter(
+                f"{self.player.name} is now level {self.player.level}!"
+            )
 
             required_exp = self.player.level * 100
 
@@ -217,20 +226,20 @@ class TurnBasedCombat:
 
         if self.player.is_alive():
 
-            print(
+            logger.typewriter(
                 f"\n{self.player.name} defeated "
                 f"{self.enemy.name}!"
             )
 
             self.player.exp += self.enemy.exp_reward
 
-            print(
+            logger.typewriter(
                 f"Gained {self.enemy.exp_reward} EXP."
             )
 
             self.player.gold += self.enemy.gold_reward
 
-            print(
+            logger.typewriter(
                 f"Gained {self.enemy.gold_reward} gold."
             )
 
@@ -238,7 +247,7 @@ class TurnBasedCombat:
 
             if dropped_item:
 
-                print(
+                logger.typewriter(
                     f"{self.enemy.name} dropped "
                     f"{dropped_item.name}!"
                 )
@@ -249,5 +258,5 @@ class TurnBasedCombat:
 
             return "win"
 
-        print("\nYou were defeated. Game Over.")
+        logger.typewriter("\nYou were defeated. Game Over.")
         return "dead"

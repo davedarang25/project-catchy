@@ -1,34 +1,28 @@
 import random
-
-from enemy import (
+from .enemy import (
     Slime,
     Goblin,
     Skeleton
 )
+from .combat import TurnBasedCombat
+from .events import RandomEvents
+from .logger import Logger
+from .utils import clear_screen
 
-from combat import TurnBasedCombat
-from events import RandomEvents
+
+logger = Logger(delay=0.02)
 
 
 def generate_path_states():
 
     path_states = {
-
         "Left": random.choice(["OPEN", "BLOCKED"]),
         "Center": random.choice(["OPEN", "BLOCKED"]),
         "Right": random.choice(["OPEN", "BLOCKED"])
-
     }
 
-    if not any(
-        state == "OPEN"
-        for state in path_states.values()
-    ):
-
-        forced_path = random.choice(
-            list(path_states.keys())
-        )
-
+    if not any(state == "OPEN" for state in path_states.values()):
+        forced_path = random.choice(list(path_states.keys()))
         path_states[forced_path] = "OPEN"
 
     return path_states
@@ -63,17 +57,16 @@ def explore_dungeon(player):
         print("SURRENDER = Quit Run")
 
         choice = input("\nChoose path (1-3): ").strip().upper()
-
+        clear_screen()
         if choice == "BAG":
-
             player.inventory.inventory_menu(player)
             continue
 
         if choice == "SURRENDER":
-
             confirm = input("Are you sure? (YES/NO): ").strip().upper()
 
             if confirm == "YES":
+                logger.loading("Ending run")
                 print("GAME OVER")
                 return False
 
@@ -84,14 +77,14 @@ def explore_dungeon(player):
             selected = path_names[int(choice) - 1]
 
             if path_states[selected] == "BLOCKED":
-
-                print(f"The {selected} path is blocked.")
+                logger.typewriter(f"The {selected} path is blocked.")
                 continue
 
-            print(
-                f"\n{player.name} enters "
-                f"{selected} path..."
-            )
+            logger.log(f"\n{player.name} enters the {selected} path...")
+            logger.log("The darkness shifts around you.")
+            logger.display_buffer()
+
+            logger.loading("Exploring")
 
             result = encounter(player)
 
@@ -121,10 +114,9 @@ def encounter(player):
             level=enemy_level
         )
 
-        print(
-            f"\nA {enemy.name} "
-            f"(Lv {enemy.level}) appears!"
-        )
+        logger.log(f"\nA {enemy.name} (Lv {enemy.level}) appears!")
+        logger.log("Combat begins.")
+        logger.display_buffer()
 
         combat = TurnBasedCombat(player, enemy)
 
@@ -137,6 +129,10 @@ def encounter(player):
 
     elif roll < 0.7:
 
+        logger.log("\nSomething unusual happens...")
+        logger.log("A random event has been triggered.")
+        logger.display_buffer()
+
         RandomEvents().trigger_event(player)
 
         if not player.is_alive():
@@ -148,5 +144,6 @@ def encounter(player):
 
     else:
 
+        logger.loading("Searching the area")
         print("Nothing happens...")
         return "continue"

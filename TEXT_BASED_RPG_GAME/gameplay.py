@@ -1,10 +1,11 @@
-from player import Rogue, Warrior, Knight
-from dungeon import explore_dungeon
-from item import HealingItem
+from .player import Rogue, Warrior, Knight
+from .dungeon import explore_dungeon
+from .item import HealingItem
+from .utils import clear_screen
 
 
 def start_game():
-
+    clear_screen()
     print("\n=== Character Selection ===")
     print("1. Rogue")
     print("2. Warrior")
@@ -45,14 +46,14 @@ def start_game():
 def run_game_loop(player):
 
     while True:
-
+        clear_screen()
         print("\n=== Gameplay Menu ===")
         print("1. Explore Dungeon")
         print("2. Check Inventory")
         print("3. Return to Main Menu")
 
         action = input("Choose an action: ").strip()
-
+        clear_screen()
         if action == "1":
 
             result = explore_dungeon(player)

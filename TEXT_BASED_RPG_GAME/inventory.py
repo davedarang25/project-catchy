@@ -1,4 +1,5 @@
-from item import Item
+from .item import Item
+from .utils import clear_screen
 
 
 class Inventory:
@@ -133,7 +134,7 @@ class Inventory:
             print("=" * 30)
 
             choice = input("Choose: ").strip()
-
+            clear_screen()
             if choice == "1":
                 self.weapon_menu(player)
 
@@ -171,7 +172,7 @@ class Inventory:
         print(f"{len(weapons) + 1}. Exit")
 
         choice = input("Choose: ").strip()
-
+        clear_screen()
         if choice == str(len(weapons) + 1):
             return
 
@@ -198,7 +199,7 @@ class Inventory:
         print("4. Exit")
 
         slot = input("Choose slot: ").strip()
-
+        clear_screen()
         if slot == "4":
             return
 
@@ -227,7 +228,7 @@ class Inventory:
         print(f"{len(armors) + 1}. Exit")
 
         choice = input("Choose: ").strip()
-
+        clear_screen()
         if choice == str(len(armors) + 1):
             return
 
@@ -266,7 +267,7 @@ class Inventory:
         print(f"{len(items) + 1}. Exit")
 
         choice = input("Choose: ").strip()
-
+        clear_screen()
         if choice == str(len(items) + 1):
             return
 

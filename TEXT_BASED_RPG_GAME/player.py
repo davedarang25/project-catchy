@@ -1,7 +1,7 @@
-from character import Character
-from inventory import Inventory
+from .character import Character
+from .inventory import Inventory
 
-from item import (
+from .item import (
     rusty_dagger,
     wooden_sword,
     cloth_armor,
