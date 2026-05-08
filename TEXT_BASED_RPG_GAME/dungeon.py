@@ -1,56 +1,152 @@
 import random
-from enemy import Slime, Goblin, Skeleton  # Import the specific entities
+
+from enemy import (
+    Slime,
+    Goblin,
+    Skeleton
+)
+
 from combat import TurnBasedCombat
 from events import RandomEvents
 
+
+def generate_path_states():
+
+    path_states = {
+
+        "Left": random.choice(["OPEN", "BLOCKED"]),
+        "Center": random.choice(["OPEN", "BLOCKED"]),
+        "Right": random.choice(["OPEN", "BLOCKED"])
+
+    }
+
+    if not any(
+        state == "OPEN"
+        for state in path_states.values()
+    ):
+
+        forced_path = random.choice(
+            list(path_states.keys())
+        )
+
+        path_states[forced_path] = "OPEN"
+
+    return path_states
+
+
 def explore_dungeon(player):
-    print("\n" + "="*25)
-    print("   DUNGEON EXPLORATION   ")
-    print("="*25)
 
-    paths = ["Left", "Center", "Right"]
-    random.shuffle(paths)
+    if not hasattr(player, "path_level"):
+        player.path_level = 1
 
-    print("Available paths:")
-    for idx, path in enumerate(paths, start=1):
-        print(f"{idx}. {path}")
+    while True:
 
-    choice = input("Choose a path to explore (1-3): ").strip()
+        path_states = generate_path_states()
 
-    if choice in ["1", "2", "3"]:
-        chosen_path = paths[int(choice) - 1]
-        print(f"\n{player.name} cautiously walks down the {chosen_path} path...")
-        encounter(player)
-    else:
-        print("Invalid choice. You stay put, wary of the shadows.")
+        print("\n" + "=" * 30)
+        print(f"        PATH {player.path_level}")
+        print("=" * 30)
+
+        print(f"HP: {player.hp}/{player.max_hp}")
+        print(f"Gold: {player.gold}")
+        print(f"EXP: {player.exp}")
+        print(f"Level: {player.level}")
+
+        print("\nAvailable Paths:")
+
+        path_names = list(path_states.keys())
+
+        for i, path in enumerate(path_names, 1):
+            print(f"{i}. {path} [{path_states[path]}]")
+
+        print("\nBAG = Inventory")
+        print("SURRENDER = Quit Run")
+
+        choice = input("\nChoose path (1-3): ").strip().upper()
+
+        if choice == "BAG":
+
+            player.inventory.inventory_menu(player)
+            continue
+
+        if choice == "SURRENDER":
+
+            confirm = input("Are you sure? (YES/NO): ").strip().upper()
+
+            if confirm == "YES":
+                print("GAME OVER")
+                return False
+
+            continue
+
+        if choice in ["1", "2", "3"]:
+
+            selected = path_names[int(choice) - 1]
+
+            if path_states[selected] == "BLOCKED":
+
+                print(f"The {selected} path is blocked.")
+                continue
+
+            print(
+                f"\n{player.name} enters "
+                f"{selected} path..."
+            )
+
+            result = encounter(player)
+
+            if result == "dead":
+                return False
+
+            player.path_level += 1
+            continue
+
+        print("Invalid input.")
+
 
 def encounter(player):
+
     roll = random.random()
-    
-    # 40% chance → Enemy Encounter
+
     if roll < 0.4:
-        # Determine enemy level based on player level (with a little variance)
-        enemy_level = max(1, player.level + random.randint(-1, 1))
-        
-        # Pick a random enemy class from your module
+
+        enemy_level = max(
+            1,
+            player.level + random.randint(-1, 1)
+        )
+
         enemy_pool = [Slime, Goblin, Skeleton]
-        chosen_class = random.choice(enemy_pool)
-        
-        # Instantiate the enemy
-        enemy = chosen_class(level=enemy_level)
-        
-        print(f"\n*** A wild {enemy.name} (Lv. {enemy.level}) appears! ***")
-        print(enemy.get_info())
 
-        # Start the combat loop
+        enemy = random.choice(enemy_pool)(
+            level=enemy_level
+        )
+
+        print(
+            f"\nA {enemy.name} "
+            f"(Lv {enemy.level}) appears!"
+        )
+
         combat = TurnBasedCombat(player, enemy)
-        combat.start_combat()
 
-    # 30% chance → Random Event (Traps, Shrines, etc.)
+        result = combat.start_combat()
+
+        if result == "dead":
+            return "dead"
+
+        return "continue"
+
     elif roll < 0.7:
-        event_system = RandomEvents()
-        event_system.trigger_event(player)
 
-    # 30% chance → Nothing happens
+        RandomEvents().trigger_event(player)
+
+        if not player.is_alive():
+            print("\nYou died from the event.")
+            print("GAME OVER")
+            return "dead"
+
+        return "continue"
+
     else:
-        print("\nThe corridor is eerily silent. You find nothing but dust.")
+
+        print("Nothing happens...")
+        return "continue"

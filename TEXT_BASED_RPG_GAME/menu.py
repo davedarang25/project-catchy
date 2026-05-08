@@ -1,9 +1,10 @@
-# menu.py
 def show_menu():
+
     print("\n=== Main Menu ===")
     print("1. Start Game")
     print("2. Leaderboard")
     print("3. Exit")
 
     choice = input("Enter your choice: ").strip()
+
     return choice
