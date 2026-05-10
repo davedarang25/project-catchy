@@ -1,11 +1,17 @@
+import copy
+
 from .character import Character
 from .inventory import Inventory
 
 from .item import (
     rusty_dagger,
     wooden_sword,
-    cloth_armor,
-    leather_armor,
+    cloth_helmet,
+    cloth_chestplate,
+    cloth_leggings,
+    leather_helmet,
+    leather_chestplate,
+    leather_leggings,
     wooden_shield
 )
 
@@ -33,89 +39,125 @@ class Player(Character):
 
         self.exp = 0
         self.gold = 0
-
         self.path_level = 1
 
+        self.temp_attack_bonus = 0
+        self.attack_boost_turns = 0
 
-class Rogue(Player):
+        self.temp_defense_bonus = 0
+        self.defense_boost_turns = 0
 
-    def __init__(self, name="Rogue"):
+    def required_exp_to_level(self):
 
-        super().__init__(
-            name=name,
-            hp=80,
-            attack=15,
-            defense=3
+        return self.level * 100
+
+    def get_exp_info(self):
+
+        return (
+            f"{self.exp}/"
+            f"{self.required_exp_to_level()}"
         )
 
-        self.crit_rate = 0.2
-        self.dodge = 0.15
+    def check_level_up(self):
 
-        self.inventory.add_item(rusty_dagger)
-        self.inventory.add_item(cloth_armor)
+        while self.exp >= self.required_exp_to_level():
 
-        self.inventory.equip_item(
+            required_exp = self.required_exp_to_level()
+
+            self.exp -= required_exp
+            self.level += 1
+
+            self.max_hp += 20
+            self.hp = self.max_hp
+
+            self.attack += 3
+            self.defense += 2
+
+            print("\nLEVEL UP!")
+
+            print(
+                f"{self.name} is now "
+                f"level {self.level}!"
+            )
+
+            print("+20 Max HP")
+            print("+3 Attack")
+            print("+2 Defense")
+            print("HP fully restored.")
+
+
+PLAYER_CLASSES = {
+
+    "Rogue": {
+        "hp": 80,
+        "attack": 15,
+        "defense": 3,
+        "extra_stats": {
+            "crit_rate": 0.2,
+            "dodge": 0.15
+        },
+        "equipment": [
             rusty_dagger,
-            self
-        )
+            cloth_helmet,
+            cloth_chestplate,
+            cloth_leggings
+        ]
+    },
 
-        self.inventory.equip_item(
-            cloth_armor,
-            self
-        )
-
-
-class Warrior(Player):
-
-    def __init__(self, name="Warrior"):
-
-        super().__init__(
-            name=name,
-            hp=120,
-            attack=12,
-            defense=8
-        )
-
-        self.strength = 5
-        self.rage = 0
-
-        self.inventory.add_item(wooden_sword)
-        self.inventory.add_item(leather_armor)
-
-        self.inventory.equip_item(
+    "Warrior": {
+        "hp": 120,
+        "attack": 12,
+        "defense": 8,
+        "extra_stats": {
+            "strength": 5,
+            "rage": 0
+        },
+        "equipment": [
             wooden_sword,
-            self
-        )
+            leather_helmet,
+            leather_chestplate,
+            leather_leggings
+        ]
+    },
 
-        self.inventory.equip_item(
-            leather_armor,
-            self
-        )
-
-
-class Knight(Player):
-
-    def __init__(self, name="Knight"):
-
-        super().__init__(
-            name=name,
-            hp=150,
-            attack=10,
-            defense=12
-        )
-
-        self.shield_block = 0.25
-        self.endurance = 10
-
-        self.inventory.add_item(wooden_sword)
-        self.inventory.add_item(wooden_shield)
-
-        self.inventory.equip_item(
+    "Knight": {
+        "hp": 150,
+        "attack": 10,
+        "defense": 12,
+        "extra_stats": {
+            "shield_block": 0.25,
+            "endurance": 10
+        },
+        "equipment": [
             wooden_sword,
-            self
-        )
+            leather_helmet,
+            leather_chestplate,
+            leather_leggings,
+            wooden_shield
+        ]
+    }
+}
 
-        self.inventory.equip_item(
-            wooden_shield,
-            self
-        )
+
+def create_player(class_name):
+
+    data = PLAYER_CLASSES[class_name]
+
+    player = Player(
+        name=class_name,
+        hp=data["hp"],
+        attack=data["attack"],
+        defense=data["defense"]
+    )
+
+    for stat_name, stat_value in data["extra_stats"].items():
+        setattr(player, stat_name, stat_value)
+
+    for item_template in data["equipment"]:
+
+        item = copy.deepcopy(item_template)
+
+        player.inventory.add_item(item, player)
+        player.inventory.equip_item(item, player)
+
+    return player

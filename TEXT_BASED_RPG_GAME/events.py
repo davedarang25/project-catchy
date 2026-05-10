@@ -71,3 +71,12 @@ class RandomEvents:
         else:
 
             print("Nothing happened.")
+
+        event_exp = 10
+
+        player.exp += event_exp
+
+        print(f"You gained {event_exp} EXP from the event.")
+
+        if hasattr(player, "check_level_up"):
+            player.check_level_up()

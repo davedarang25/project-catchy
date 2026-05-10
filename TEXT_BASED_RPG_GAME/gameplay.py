@@ -1,30 +1,37 @@
-from .player import Rogue, Warrior, Knight
+from .player import create_player
 from .dungeon import explore_dungeon
 from .item import HealingItem
-from .utils import clear_screen
+
+try:
+    from .utils import clear_screen
+except ImportError:
+
+    def clear_screen():
+        pass
 
 
 def start_game():
-    clear_screen()
+
     print("\n=== Character Selection ===")
     print("1. Rogue")
     print("2. Warrior")
     print("3. Knight")
 
     choice = input("Choose your class: ").strip()
+    clear_screen()
 
     if choice == "1":
-        player = Rogue("Rogue")
+        player = create_player("Rogue")
 
     elif choice == "2":
-        player = Warrior("Warrior")
+        player = create_player("Warrior")
 
     elif choice == "3":
-        player = Knight("Knight")
+        player = create_player("Knight")
 
     else:
         print("Invalid choice. Defaulting to Rogue.")
-        player = Rogue("Rogue")
+        player = create_player("Rogue")
 
     print(
         f"\nYou have chosen {player.name}. "
@@ -34,11 +41,14 @@ def start_game():
     starter_potion = HealingItem(
         100,
         "Healing Potion",
-        "Restores 50 HP",
+        "Restores 50 HP.",
         50
     )
 
-    player.inventory.add_item(starter_potion)
+    player.inventory.add_item(
+        starter_potion,
+        player
+    )
 
     run_game_loop(player)
 
@@ -46,7 +56,7 @@ def start_game():
 def run_game_loop(player):
 
     while True:
-        clear_screen()
+
         print("\n=== Gameplay Menu ===")
         print("1. Explore Dungeon")
         print("2. Check Inventory")
@@ -54,6 +64,7 @@ def run_game_loop(player):
 
         action = input("Choose an action: ").strip()
         clear_screen()
+
         if action == "1":
 
             result = explore_dungeon(player)

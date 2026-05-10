@@ -1,4 +1,84 @@
+import random
+
 from .character import Character
+
+
+ENEMY_MODS = {
+    "Slime": {
+        "hp_bonus": 15,
+        "attack_bonus": -2,
+        "defense_bonus": 0,
+        "exp_bonus": 0,
+        "gold_bonus": 0
+    },
+
+    "Goblin": {
+        "hp_bonus": 0,
+        "attack_bonus": 0,
+        "defense_bonus": 0,
+        "exp_bonus": 0,
+        "gold_bonus": 5
+    },
+
+    "Skeleton": {
+        "hp_bonus": -10,
+        "attack_bonus": 4,
+        "defense_bonus": 0,
+        "exp_bonus": 0,
+        "gold_bonus": 0
+    },
+
+    "Bat": {
+        "hp_bonus": -15,
+        "attack_bonus": 3,
+        "defense_bonus": -1,
+        "exp_bonus": 5,
+        "gold_bonus": 2
+    },
+
+    "Spider": {
+        "hp_bonus": 5,
+        "attack_bonus": 2,
+        "defense_bonus": 1,
+        "exp_bonus": 8,
+        "gold_bonus": 3
+    },
+
+    "Wolf": {
+        "hp_bonus": 10,
+        "attack_bonus": 5,
+        "defense_bonus": 0,
+        "exp_bonus": 12,
+        "gold_bonus": 5
+    }
+}
+
+
+BOSS_MODS = {
+    "Goblin King": {
+        "hp_bonus": 20,
+        "attack_bonus": 3,
+        "defense_bonus": 1,
+        "exp_bonus": 25,
+        "gold_bonus": 25
+    },
+
+    "Skeleton Lord": {
+        "hp_bonus": 10,
+        "attack_bonus": 5,
+        "defense_bonus": 2,
+        "exp_bonus": 35,
+        "gold_bonus": 30
+    },
+
+    "Slime Monarch": {
+        "hp_bonus": 35,
+        "attack_bonus": 2,
+        "defense_bonus": 3,
+        "exp_bonus": 30,
+        "gold_bonus": 25
+    }
+}
 
 
 class Enemy(Character):
@@ -31,20 +111,20 @@ class Enemy(Character):
 
     def drop_item(self):
 
-        from item import (
+        from .item import (
             random_drop,
             SLIME_DROPS,
             GOBLIN_DROPS,
             SKELETON_DROPS
         )
 
-        if self.name == "Slime":
+        if self.name in ["Slime", "Slime Monarch"]:
             return random_drop(SLIME_DROPS)
 
-        elif self.name == "Goblin":
+        elif self.name in ["Goblin", "Goblin King", "Bat", "Spider", "Wolf"]:
             return random_drop(GOBLIN_DROPS)
 
-        elif self.name == "Skeleton":
+        elif self.name in ["Skeleton", "Skeleton Lord"]:
             return random_drop(SKELETON_DROPS)
 
         return None
@@ -71,6 +151,27 @@ class OrdinaryEnemy(Enemy):
 
         exp_reward = 20 + (level * 5)
         gold_reward = 10 + (level * 3)
+
+        mods = ENEMY_MODS.get(
+            name,
+            {
+                "hp_bonus": 0,
+                "attack_bonus": 0,
+                "defense_bonus": 0,
+                "exp_bonus": 0,
+                "gold_bonus": 0
+            }
+        )
+
+        hp += mods["hp_bonus"]
+        attack += mods["attack_bonus"]
+        defense += mods["defense_bonus"]
+        exp_reward += mods["exp_bonus"]
+        gold_reward += mods["gold_bonus"]
+
+        hp = max(1, hp)
+        attack = max(1, attack)
+        defense = max(0, defense)
 
         super().__init__(
             name=name,
@@ -109,12 +210,33 @@ class BossEnemy(Enemy):
         phase=1
     ):
 
-        hp = 100 + (level * 25)
-        attack = 12 + (level * 4)
-        defense = 5 + (level * 2)
+        hp = 80 + (level * 20)
+        attack = 10 + (level * 3)
+        defense = 4 + level
 
-        exp_reward = 80 + (level * 20)
-        gold_reward = 50 + (level * 10)
+        exp_reward = 80 + (level * 15)
+        gold_reward = 50 + (level * 8)
+
+        mods = BOSS_MODS.get(
+            name,
+            {
+                "hp_bonus": 0,
+                "attack_bonus": 0,
+                "defense_bonus": 0,
+                "exp_bonus": 0,
+                "gold_bonus": 0
+            }
+        )
+
+        hp += mods["hp_bonus"]
+        attack += mods["attack_bonus"]
+        defense += mods["defense_bonus"]
+        exp_reward += mods["exp_bonus"]
+        gold_reward += mods["gold_bonus"]
+
+        hp = max(1, hp)
+        attack = max(1, attack)
+        defense = max(0, defense)
 
         super().__init__(
             name=name,
@@ -129,19 +251,34 @@ class BossEnemy(Enemy):
         )
 
         self.phase = phase
+        self.special_chance = 0.30
 
-    def special_attack(self, target):
+    def normal_attack(self, target):
 
         damage = max(
             1,
-            (self.attack * 2) - target.defense
+            self.attack - target.defense
         )
 
         target.take_damage(damage)
 
         print(
-            f"{self.name} uses "
-            f"a special attack on "
+            f"{self.name} attacks "
+            f"{target.name} for "
+            f"{damage} damage!"
+        )
+
+    def special_attack(self, target):
+
+        damage = max(
+            1,
+            int(self.attack * 1.5) - target.defense
+        )
+
+        target.take_damage(damage)
+
+        print(
+            f"{self.name} uses a heavy attack on "
             f"{target.name} for "
             f"{damage} damage!"
         )
@@ -159,66 +296,29 @@ class BossEnemy(Enemy):
                 f"{self.name} enters Phase 2!"
             )
 
-        if self.phase == 2:
+        if (
+            self.phase == 2
+            and random.random() <= self.special_chance
+        ):
 
             self.special_attack(target)
 
         else:
 
-            damage = max(
-                1,
-                self.attack - target.defense
-            )
-
-            target.take_damage(damage)
-
-            print(
-                f"{self.name} attacks "
-                f"{target.name} for "
-                f"{damage} damage!"
-            )
+            self.normal_attack(target)
 
 
-class Slime(OrdinaryEnemy):
+def create_ordinary_enemy(name, level):
 
-    def __init__(self, level=1):
-
-        super().__init__(
-            name="Slime",
-            level=level
-        )
-
-        self.hp += 15
-        self.max_hp += 15
-
-        self.attack = max(
-            1,
-            self.attack - 2
-        )
+    return OrdinaryEnemy(
+        name=name,
+        level=level
+    )
 
 
-class Goblin(OrdinaryEnemy):
+def create_boss_enemy(name, level):
 
-    def __init__(self, level=1):
-
-        super().__init__(
-            name="Goblin",
-            level=level
-        )
-
-        self.gold_reward += 5
-
-
-class Skeleton(OrdinaryEnemy):
-
-    def __init__(self, level=1):
-
-        super().__init__(
-            name="Skeleton",
-            level=level
-        )
-
-        self.attack += 4
-
-        self.hp = max(1, self.hp - 10)
-        self.max_hp = max(1, self.max_hp - 10)
+    return BossEnemy(
+        name=name,
+        level=level
+    )
