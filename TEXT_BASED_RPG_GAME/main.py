@@ -10,9 +10,8 @@ def main():
     print("=== Welcome to the Exiled Below RPG Game ===")
 
     while True:
-        clear_screen()
         choice = show_menu()
-
+        clear_screen()
         if choice == "1":
             start_game()
 
@@ -22,7 +21,7 @@ def main():
         elif choice == "3":
 
             confirm = input("Exit Game? (y/n): ").strip().lower()
-
+            clear_screen()
             if confirm == "y":
 
                 print("Thanks for Playing!")
