@@ -1,16 +1,21 @@
-from .item import Item
+try:
+    from .item import Item
+except ImportError:
+    from item import Item
 
 try:
     from .utils import clear_screen
 except ImportError:
-
-    def clear_screen():
-        pass
+    try:
+        from utils import clear_screen
+    except ImportError:
+        def clear_screen():
+            pass
 
 
 class Inventory:
 
-    def __init__(self, capacity=10):
+    def __init__(self, capacity=20):
 
         self.capacity = capacity
         self.items = []
@@ -33,7 +38,7 @@ class Inventory:
 
         if self.is_full():
 
-            print("\nInventory is full.")
+            print("\nWARNING: Your bag is full!")
             print(f"You cannot carry {item.name}.")
             print("Do you want to discard an item to make space?")
             print("1. Yes")
@@ -57,6 +62,9 @@ class Inventory:
         self.items.append(item)
 
         print(f"{item.name} added to inventory.")
+
+        if self.is_full():
+            print("\nWARNING: Your bag is now full!")
 
         return True
 
@@ -83,6 +91,9 @@ class Inventory:
         print("\n=== INVENTORY ===")
         print(f"Capacity: {len(self.items)}/{self.capacity}")
 
+        if self.is_full():
+            print("WARNING: Bag is full!")
+
         for i, item in enumerate(self.items, 1):
 
             equipped_text = ""
@@ -91,6 +102,127 @@ class Inventory:
                 equipped_text = " [EQUIPPED]"
 
             print(f"{i}. {item.get_info()}{equipped_text}")
+
+    def view_all_items_menu(self, player):
+
+        while True:
+
+            print("\n" + "=" * 30)
+            print("        ALL ITEMS")
+            print("=" * 30)
+
+            print(f"Capacity: {len(self.items)}/{self.capacity}")
+
+            if self.is_full():
+                print("WARNING: Bag is full!")
+
+            if self.is_empty():
+
+                print("\nInventory is empty.")
+                input("\nPress Enter to return...")
+                clear_screen()
+                return
+
+            for i, item in enumerate(self.items, 1):
+
+                equipped_text = ""
+
+                if self.is_equipped(item):
+                    equipped_text = " [EQUIPPED]"
+
+                print(
+                    f"{i}. {item.get_info()}"
+                    f"{equipped_text}"
+                )
+
+            print(f"{len(self.items) + 1}. Exit")
+
+            choice = input("\nChoose item: ").strip()
+            clear_screen()
+
+            if choice == str(len(self.items) + 1):
+                return
+
+            try:
+
+                item = self.items[int(choice) - 1]
+
+                print("\n" + "=" * 30)
+                print(f"Selected: {item.name}")
+                print("=" * 30)
+
+                if item.itemType == "Weapon":
+
+                    print("1. Equip")
+                    print("2. Discard")
+                    print("3. Cancel")
+
+                    action = input("Choose: ").strip()
+                    clear_screen()
+
+                    if action == "1":
+                        self.equip_item(item, player)
+
+                    elif action == "2":
+                        self.discard_item(item, player)
+
+                    elif action == "3":
+                        continue
+
+                    else:
+                        print("Invalid choice.")
+
+                elif item.itemType == "Armor":
+
+                    print("1. Equip")
+                    print("2. Discard")
+                    print("3. Cancel")
+
+                    action = input("Choose: ").strip()
+                    clear_screen()
+
+                    if action == "1":
+                        self.equip_item(item, player)
+
+                    elif action == "2":
+                        self.discard_item(item, player)
+
+                    elif action == "3":
+                        continue
+
+                    else:
+                        print("Invalid choice.")
+
+                elif item.itemType == "Consumable":
+
+                    print("1. Use")
+                    print("2. Discard")
+                    print("3. Cancel")
+
+                    action = input("Choose: ").strip()
+                    clear_screen()
+
+                    if action == "1":
+                        self.use_item(item, player)
+
+                    elif action == "2":
+                        self.discard_item(item, player)
+
+                    elif action == "3":
+                        continue
+
+                    else:
+                        print("Invalid choice.")
+
+                else:
+
+                    print("Unknown item type.")
+                    input("\nPress Enter to continue...")
+                    clear_screen()
+
+            except (ValueError, IndexError):
+
+                print("Invalid choice.")
 
     def is_equipped(self, item):
 
@@ -182,6 +314,9 @@ class Inventory:
 
             print("\n=== DISCARD ITEM ===")
             print(f"Capacity: {len(self.items)}/{self.capacity}")
+
+            if self.is_full():
+                print("WARNING: Bag is full!")
 
             for i, item in enumerate(self.items, 1):
 
@@ -286,6 +421,10 @@ class Inventory:
 
             print("\n" + "=" * 30)
             print(f"Capacity: {len(self.items)}/{self.capacity}")
+
+            if self.is_full():
+                print("WARNING: Bag is full!")
+
             print("1. Weapon")
             print("2. Armor")
             print("3. Items")
@@ -307,7 +446,7 @@ class Inventory:
                 self.item_menu(player)
 
             elif choice == "4":
-                self.show_items()
+                self.view_all_items_menu(player)
 
             elif choice == "5":
                 self.discard_from_full_inventory(player)
@@ -555,8 +694,7 @@ class Inventory:
             clear_screen()
 
             if action == "1":
-                item.use(player)
-                self.remove_item(item)
+                self.use_item(item, player)
 
             elif action == "2":
                 self.discard_item(item, player)
