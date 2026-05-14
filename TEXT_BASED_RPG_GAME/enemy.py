@@ -31,7 +31,7 @@ class Enemy(Character):
 
     def drop_item(self):
 
-        from item import (
+        from .item import (
             random_drop,
             SLIME_DROPS,
             GOBLIN_DROPS,
