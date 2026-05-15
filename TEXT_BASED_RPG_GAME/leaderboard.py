@@ -1,15 +1,11 @@
-# leaderboard.py
-
-try:
-    from .utils import clear_screen
-except ImportError:
-    from utils import clear_screen
+from .utils import clear_screen
 
 
 SCORE_FILE = "leaderboard.txt"
 
 
 def calculate_score(player):
+
     path_score = player.path_level * 100
     level_score = player.level * 50
     exp_score = player.exp
@@ -26,6 +22,7 @@ def calculate_score(player):
 
 
 def save_score(player):
+
     score = calculate_score(player)
 
     with open(SCORE_FILE, "a") as file:
@@ -40,6 +37,7 @@ def save_score(player):
 
 
 def load_scores():
+
     scores = []
 
     try:
@@ -73,17 +71,21 @@ def load_scores():
 
 
 def show_leaderboard():
+
     while True:
 
         clear_screen()
 
-        print("\n=== Leaderboard ===")
+        print("\n" + "=" * 60)
+        print("                      LEADERBOARD")
+        print("=" * 60)
 
         scores = load_scores()
 
         if not scores:
 
-            print("No Result")
+            print("\nNo Result")
+            print("\nPlay a run first to save your score.")
 
         else:
 
@@ -93,20 +95,49 @@ def show_leaderboard():
                 reverse=True
             )
 
-            for idx, entry in enumerate(sorted_scores, start=1):
+            top_scores = sorted_scores[:10]
+
+            print("\nTop 10 Runs")
+            print("-" * 60)
+
+            print(
+                f"{'Rank':<6}"
+                f"{'Class':<12}"
+                f"{'Score':<10}"
+                f"{'Path':<8}"
+                f"{'Level':<8}"
+                f"{'EXP':<8}"
+                f"{'Gold':<8}"
+            )
+
+            print("-" * 60)
+
+            for idx, entry in enumerate(top_scores, start=1):
 
                 print(
-                    f"{idx}. {entry['name']} | "
-                    f"Score: {entry['score']} | "
-                    f"Path: {entry['path_level']} | "
-                    f"Level: {entry['level']} | "
-                    f"EXP: {entry['exp']} | "
-                    f"Gold: {entry['gold']}"
+                    f"{idx:<6}"
+                    f"{entry['name']:<12}"
+                    f"{entry['score']:<10}"
+                    f"{entry['path_level']:<8}"
+                    f"{entry['level']:<8}"
+                    f"{entry['exp']:<8}"
+                    f"{entry['gold']:<8}"
                 )
 
-        choice = input("\nExit Leaderboard? (y/n): ").strip().lower()
+            print("-" * 60)
 
-        if choice == "y":
+        print("\n1. Return to Main Menu")
+        print("=" * 60)
 
+        choice = input("Choose: ").strip()
+
+        if choice == "1":
+
+            clear_screen()
             print("Returning to Main Menu...")
             break
+
+        else:
+
+            print("Invalid choice.")
+            input("Press Enter to continue...")
