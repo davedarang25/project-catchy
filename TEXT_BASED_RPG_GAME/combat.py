@@ -1,6 +1,8 @@
 import random
-from .logger import logger
+from .logger import Logger
+from .utils import clear_screen
 
+logger = Logger(delay=0.02)
 
 class TurnBasedCombat:
 
@@ -57,7 +59,7 @@ class TurnBasedCombat:
             print("4. Special Attack")
 
             choice = input("Enter choice: ").strip()
-
+            clear_screen()
             if choice == "1":
 
                 self.player_attack()
@@ -96,7 +98,8 @@ class TurnBasedCombat:
 
                 else:
                     logger.typewriter("No special attack available.")
-
+                self.current_turn = "Enemy"
+                break
             else:
 
                 print("Invalid choice. Try again.")

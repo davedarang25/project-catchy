@@ -2,6 +2,9 @@ import copy
 
 from .character import Character
 from .inventory import Inventory
+from .logger import Logger
+
+logger = Logger(delay=0.02)
 
 from .item import (
     rusty_dagger,
@@ -156,7 +159,7 @@ class Rogue(Player):
         damage = self.attack * 2
         enemy.take_damage(damage)
 
-        print(
+        logger.typewriter(
             f"{self.name} uses Backstab! "
             f"It deals {damage} damage."
         )
@@ -189,7 +192,7 @@ class Warrior(Player):
 
         self.rage += 5
 
-        print(
+        logger.typewriter(
             f"{self.name} uses Power Strike! "
             f"It deals {damage} damage."
         )
@@ -223,7 +226,7 @@ class Knight(Player):
 
         self.defense += 1
 
-        print(
+        logger.typewriter(
             f"{self.name} uses Shield Bash! "
             f"It deals {damage} damage and increases defense by 1."
         )

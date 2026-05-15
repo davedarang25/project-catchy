@@ -304,12 +304,14 @@ def encounter(player):
         if not player.is_alive():
 
             return "dead"
-
+        logger.loading("")
+        clear_screen()
         return "continue"
 
     else:
 
         logger.loading("Searching the area")
         print("Nothing happens...")
-
+        logger.loading("")
+        clear_screen()
         return "continue"
