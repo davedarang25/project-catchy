@@ -53,6 +53,7 @@ class TurnBasedCombat:
             print("1. Attack")
             print("2. Use Item")
             print("3. Defend")
+            print("4. Special Attack")
 
             choice = input("Enter choice: ").strip()
 
@@ -81,6 +82,19 @@ class TurnBasedCombat:
 
                 self.current_turn = "Enemy"
                 break
+            elif choice == "4":
+
+                if hasattr(self.player, "special_attack"):
+
+                    if self.check_hit(self.player, self.enemy):
+                        self.player.special_attack(self.enemy)
+                    else:
+                        logger.typewriter(
+                            f"{self.player.name}'s special attack missed!"
+                        )
+
+                else:
+                    logger.typewriter("No special attack available.")
 
             else:
 

@@ -152,18 +152,13 @@ class Rogue(Player):
             cloth_leggings
         ])
 
-    def special_attack(self, target):
-
-        damage = max(
-            1,
-            int((self.attack * 2.5) - target.defense)
-        )
-
-        target.take_damage(damage)
+    def special_attack(self, enemy):
+        damage = self.attack * 2
+        enemy.take_damage(damage)
 
         print(
-            f"{self.name} uses Shadow Strike "
-            f"on {target.name} for {damage} damage!"
+            f"{self.name} uses Backstab! "
+            f"It deals {damage} damage."
         )
 
 
@@ -188,25 +183,15 @@ class Warrior(Player):
             leather_leggings
         ])
 
-    def special_attack(self, target):
+    def special_attack(self, enemy):
+        damage = self.attack + self.strength
+        enemy.take_damage(damage)
 
-        damage = max(
-            1,
-            int(((self.attack + self.strength) * 2) - target.defense)
-        )
-
-        target.take_damage(damage)
-
-        self.rage += 10
+        self.rage += 5
 
         print(
-            f"{self.name} uses Crushing Slash "
-            f"on {target.name} for {damage} damage!"
-        )
-
-        print(
-            f"{self.name}'s rage increased to "
-            f"{self.rage}."
+            f"{self.name} uses Power Strike! "
+            f"It deals {damage} damage."
         )
 
 
@@ -232,24 +217,15 @@ class Knight(Player):
             wooden_shield
         ])
 
-    def special_attack(self, target):
+    def special_attack(self, enemy):
+        damage = max(1, self.attack - enemy.defense)
+        enemy.take_damage(damage)
 
-        damage = max(
-            1,
-            int((self.attack * 1.8) + self.defense - target.defense)
-        )
-
-        target.take_damage(damage)
-
-        self.defense += 2
+        self.defense += 1
 
         print(
-            f"{self.name} uses Shield Breaker "
-            f"on {target.name} for {damage} damage!"
-        )
-
-        print(
-            f"{self.name} gains +2 DEF."
+            f"{self.name} uses Shield Bash! "
+            f"It deals {damage} damage and increases defense by 1."
         )
 
 
