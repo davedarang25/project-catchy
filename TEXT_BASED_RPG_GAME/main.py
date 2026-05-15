@@ -7,9 +7,6 @@ from .utils import clear_screen
 
 def main():
 
-    print()
-    print("=== Welcome to the Exiled Below RPG Game ===")
-
     while True:
         choice = show_menu()
         clear_screen()

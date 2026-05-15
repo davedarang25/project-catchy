@@ -1,16 +1,5 @@
-try:
-    from .item import Item
-except ImportError:
-    from item import Item
-
-try:
-    from .utils import clear_screen
-except ImportError:
-    try:
-        from utils import clear_screen
-    except ImportError:
-        def clear_screen():
-            pass
+from .item import Item
+from .utils import clear_screen
 
 
 class Inventory:
@@ -26,6 +15,43 @@ class Inventory:
         self.leggings = None
         self.shield = None
 
+    # =========================
+    # UI HELPERS
+    # =========================
+
+    def line(self, length=50):
+
+        print("=" * length)
+
+    def small_line(self, length=50):
+
+        print("-" * length)
+
+    def pause(self):
+
+        input("\nPress Enter to continue...")
+        clear_screen()
+
+    def slot_display(self, item):
+
+        if item:
+            return item.name
+
+        return "Empty"
+
+    def item_display(self, item):
+
+        equipped_text = ""
+
+        if self.is_equipped(item):
+            equipped_text = " [EQUIPPED]"
+
+        return f"{item.get_info()}{equipped_text}"
+
+    # =========================
+    # BASIC CHECKS
+    # =========================
+
     def is_empty(self):
 
         return len(self.items) == 0
@@ -34,17 +60,28 @@ class Inventory:
 
         return len(self.items) >= self.capacity
 
+    # =========================
+    # ADD / REMOVE
+    # =========================
+
     def add_item(self, item: Item, player=None):
 
         if self.is_full():
 
-            print("\nWARNING: Your bag is full!")
-            print(f"You cannot carry {item.name}.")
-            print("Do you want to discard an item to make space?")
+            clear_screen()
+
+            self.line()
+            print("              BAG FULL")
+            self.line()
+
+            print(f"\nYou cannot carry: {item.name}")
+            print(f"Capacity: {len(self.items)}/{self.capacity}")
+
+            print("\nDo you want to discard an item?")
             print("1. Yes")
             print("2. No")
 
-            choice = input("Choose: ").strip()
+            choice = input("\nChoose: ").strip()
             clear_screen()
 
             if choice != "1":
@@ -81,35 +118,46 @@ class Inventory:
         print("Item not found.")
         return False
 
+    # =========================
+    # DISPLAY ITEMS
+    # =========================
+
     def show_items(self):
 
-        if self.is_empty():
+        clear_screen()
 
-            print("Inventory is empty.")
-            return
+        self.line()
+        print("              INVENTORY")
+        self.line()
 
-        print("\n=== INVENTORY ===")
         print(f"Capacity: {len(self.items)}/{self.capacity}")
 
         if self.is_full():
             print("WARNING: Bag is full!")
 
+        if self.is_empty():
+
+            print("\nInventory is empty.")
+            self.pause()
+            return
+
+        print()
+
         for i, item in enumerate(self.items, 1):
 
-            equipped_text = ""
+            print(f"{i}. {self.item_display(item)}")
 
-            if self.is_equipped(item):
-                equipped_text = " [EQUIPPED]"
-
-            print(f"{i}. {item.get_info()}{equipped_text}")
+        self.pause()
 
     def view_all_items_menu(self, player):
 
         while True:
 
-            print("\n" + "=" * 30)
-            print("        ALL ITEMS")
-            print("=" * 30)
+            clear_screen()
+
+            self.line()
+            print("              ALL ITEMS")
+            self.line()
 
             print(f"Capacity: {len(self.items)}/{self.capacity}")
 
@@ -119,23 +167,16 @@ class Inventory:
             if self.is_empty():
 
                 print("\nInventory is empty.")
-                input("\nPress Enter to return...")
-                clear_screen()
+                self.pause()
                 return
+
+            print()
 
             for i, item in enumerate(self.items, 1):
 
-                equipped_text = ""
+                print(f"{i}. {self.item_display(item)}")
 
-                if self.is_equipped(item):
-                    equipped_text = " [EQUIPPED]"
-
-                print(
-                    f"{i}. {item.get_info()}"
-                    f"{equipped_text}"
-                )
-
-            print(f"{len(self.items) + 1}. Exit")
+            print(f"{len(self.items) + 1}. Back")
 
             choice = input("\nChoose item: ").strip()
             clear_screen()
@@ -147,82 +188,107 @@ class Inventory:
 
                 item = self.items[int(choice) - 1]
 
-                print("\n" + "=" * 30)
-                print(f"Selected: {item.name}")
-                print("=" * 30)
-
-                if item.itemType == "Weapon":
-
-                    print("1. Equip")
-                    print("2. Discard")
-                    print("3. Cancel")
-
-                    action = input("Choose: ").strip()
-                    clear_screen()
-
-                    if action == "1":
-                        self.equip_item(item, player)
-
-                    elif action == "2":
-                        self.discard_item(item, player)
-
-                    elif action == "3":
-                        continue
-
-                    else:
-                        print("Invalid choice.")
-
-                elif item.itemType == "Armor":
-
-                    print("1. Equip")
-                    print("2. Discard")
-                    print("3. Cancel")
-
-                    action = input("Choose: ").strip()
-                    clear_screen()
-
-                    if action == "1":
-                        self.equip_item(item, player)
-
-                    elif action == "2":
-                        self.discard_item(item, player)
-
-                    elif action == "3":
-                        continue
-
-                    else:
-                        print("Invalid choice.")
-
-                elif item.itemType == "Consumable":
-
-                    print("1. Use")
-                    print("2. Discard")
-                    print("3. Cancel")
-
-                    action = input("Choose: ").strip()
-                    clear_screen()
-
-                    if action == "1":
-                        self.use_item(item, player)
-
-                    elif action == "2":
-                        self.discard_item(item, player)
-
-                    elif action == "3":
-                        continue
-
-                    else:
-                        print("Invalid choice.")
-
-                else:
-
-                    print("Unknown item type.")
-                    input("\nPress Enter to continue...")
-                    clear_screen()
-
             except (ValueError, IndexError):
 
                 print("Invalid choice.")
+                self.pause()
+                continue
+
+            self.selected_item_menu(item, player)
+
+    def selected_item_menu(self, item, player):
+
+        while True:
+
+            clear_screen()
+
+            self.line()
+            print("             SELECTED ITEM")
+            self.line()
+
+            print(f"Name   : {item.name}")
+            print(f"Type   : {item.itemType}")
+            print(f"Rarity : {item.rarity}")
+            print(f"Info   : {item.description}")
+
+            if item.itemType == "Weapon":
+                print(f"ATK    : +{item.value}")
+
+            elif item.itemType == "Armor":
+                print(f"DEF    : +{item.value}")
+                print(f"Slot   : {item.slot}")
+
+            elif item.itemType == "Consumable":
+                print(f"Value  : {item.value}")
+
+            if self.is_equipped(item):
+                print("Status : EQUIPPED")
+
+            self.small_line()
+
+            if item.itemType in ["Weapon", "Armor"]:
+
+                print("1. Equip")
+                print("2. Discard")
+                print("3. Back")
+
+                choice = input("\nChoose: ").strip()
+
+                if choice == "1":
+                    clear_screen()
+                    self.equip_item(item, player)
+                    self.pause()
+                    return
+
+                elif choice == "2":
+                    clear_screen()
+                    self.discard_item(item, player)
+                    self.pause()
+                    return
+
+                elif choice == "3":
+                    return
+
+                else:
+                    print("Invalid choice.")
+                    self.pause()
+
+            elif item.itemType == "Consumable":
+
+                print("1. Use")
+                print("2. Discard")
+                print("3. Back")
+
+                choice = input("\nChoose: ").strip()
+
+                if choice == "1":
+                    clear_screen()
+                    self.use_item(item, player)
+                    self.pause()
+                    return
+
+                elif choice == "2":
+                    clear_screen()
+                    self.discard_item(item, player)
+                    self.pause()
+                    return
+
+                elif choice == "3":
+                    return
+
+                else:
+                    print("Invalid choice.")
+                    self.pause()
+
+            else:
+
+                print("Unknown item type.")
+                self.pause()
+                return
+
+    # =========================
+    # EQUIPPED CHECK
+    # =========================
 
     def is_equipped(self, item):
 
@@ -233,6 +299,60 @@ class Inventory:
             or item == self.leggings
             or item == self.shield
         )
+
+    # =========================
+    # EQUIP / UNEQUIP
+    # =========================
+
+    def equip_item(self, item, player):
+
+        if item not in self.items:
+
+            print("Item not found in inventory.")
+            return
+
+        if item.itemType == "Weapon":
+
+            if item == self.weapon:
+
+                print(f"{item.name} is already equipped.")
+                return
+
+            if self.weapon:
+                player.attack -= self.weapon.value
+
+            self.weapon = item
+            player.attack += item.value
+
+            print(f"{item.name} equipped as weapon.")
+
+        elif item.itemType == "Armor":
+
+            slot_name = item.slot
+
+            if not hasattr(self, slot_name):
+
+                print("Invalid armor slot.")
+                return
+
+            current = getattr(self, slot_name)
+
+            if current == item:
+
+                print(f"{item.name} is already equipped.")
+                return
+
+            if current:
+                player.defense -= current.value
+
+            setattr(self, slot_name, item)
+            player.defense += item.value
+
+            print(f"{item.name} equipped to {slot_name}.")
+
+        else:
+
+            print("This item cannot be equipped.")
 
     def unequip_item(self, item, player):
 
@@ -276,12 +396,20 @@ class Inventory:
             self.shield = None
             print(f"{item.name} unequipped.")
 
+    # =========================
+    # DISCARD
+    # =========================
+
     def discard_item(self, item, player=None):
 
         if item not in self.items:
 
             print("Item not found.")
             return False
+
+        self.line()
+        print("             DISCARD ITEM")
+        self.line()
 
         confirm = input(
             f"Discard {item.name}? (YES/NO): "
@@ -312,11 +440,18 @@ class Inventory:
 
         while True:
 
-            print("\n=== DISCARD ITEM ===")
+            clear_screen()
+
+            self.line()
+            print("             DISCARD ITEM")
+            self.line()
+
             print(f"Capacity: {len(self.items)}/{self.capacity}")
 
             if self.is_full():
                 print("WARNING: Bag is full!")
+
+            print()
 
             for i, item in enumerate(self.items, 1):
 
@@ -329,8 +464,7 @@ class Inventory:
 
             print(f"{len(self.items) + 1}. Cancel")
 
-            choice = input("Choose item to discard: ").strip()
-            clear_screen()
+            choice = input("\nChoose item to discard: ").strip()
 
             if choice == str(len(self.items) + 1):
                 return False
@@ -338,46 +472,17 @@ class Inventory:
             try:
 
                 item = self.items[int(choice) - 1]
+                clear_screen()
                 return self.discard_item(item, player)
 
             except (ValueError, IndexError):
 
                 print("Invalid choice.")
+                self.pause()
 
-    def equip_item(self, item, player):
-
-        if item.itemType == "Weapon":
-
-            if self.weapon:
-                player.attack -= self.weapon.value
-
-            self.weapon = item
-            player.attack += item.value
-
-            print(f"{item.name} equipped.")
-
-        elif item.itemType == "Armor":
-
-            slot_name = item.slot
-
-            if not hasattr(self, slot_name):
-
-                print("Invalid armor slot.")
-                return
-
-            current = getattr(self, slot_name)
-
-            if current:
-                player.defense -= current.value
-
-            setattr(self, slot_name, item)
-            player.defense += item.value
-
-            print(f"{item.name} equipped.")
-
-        else:
-
-            print("This item cannot be equipped.")
+    # =========================
+    # USE ITEM
+    # =========================
 
     def use_item(self, item, player):
 
@@ -394,47 +499,54 @@ class Inventory:
         item.use(player)
         self.remove_item(item)
 
+    # =========================
+    # MAIN INVENTORY MENU
+    # =========================
+
     def inventory_menu(self, player):
 
         while True:
 
-            print("\n" + "=" * 30)
-            print("         PLAYER STATS")
-            print("=" * 30)
+            clear_screen()
 
-            print(f"HP: {player.hp}/{player.max_hp}")
-            print(f"ATK: {player.attack}")
-            print(f"DEF: {player.defense}")
-            print(f"GOLD: {player.gold}")
-            print(f"EXP: {player.exp}")
-            print(f"LEVEL: {player.level}")
+            self.line()
+            print("              INVENTORY")
+            self.line()
 
-            print("\n" + "=" * 30)
-            print("      EQUIPPED ITEMS")
-            print("=" * 30)
+            print("PLAYER STATS")
+            self.small_line()
+            print(f"HP    : {player.hp}/{player.max_hp}")
+            print(f"ATK   : {player.attack}")
+            print(f"DEF   : {player.defense}")
+            print(f"GOLD  : {player.gold}")
+            print(f"EXP   : {player.get_exp_info()}")
+            print(f"LEVEL : {player.level}")
 
-            print(f"Weapon: {self.weapon.name if self.weapon else 'Empty'}")
-            print(f"Helmet: {self.helmet.name if self.helmet else 'Empty'}")
-            print(f"Chest : {self.chestplate.name if self.chestplate else 'Empty'}")
-            print(f"Legs  : {self.leggings.name if self.leggings else 'Empty'}")
-            print(f"Shield: {self.shield.name if self.shield else 'Empty'}")
+            print()
+            print("EQUIPPED ITEMS")
+            self.small_line()
+            print(f"Weapon : {self.slot_display(self.weapon)}")
+            print(f"Helmet : {self.slot_display(self.helmet)}")
+            print(f"Chest  : {self.slot_display(self.chestplate)}")
+            print(f"Legs   : {self.slot_display(self.leggings)}")
+            print(f"Shield : {self.slot_display(self.shield)}")
 
-            print("\n" + "=" * 30)
-            print(f"Capacity: {len(self.items)}/{self.capacity}")
+            print()
+            print(f"Bag Capacity: {len(self.items)}/{self.capacity}")
 
             if self.is_full():
                 print("WARNING: Bag is full!")
 
+            self.line()
             print("1. Weapon")
             print("2. Armor")
             print("3. Items")
             print("4. View All Items")
             print("5. Discard Item")
             print("6. Exit")
-            print("=" * 30)
+            self.line()
 
             choice = input("Choose: ").strip()
-            clear_screen()
 
             if choice == "1":
                 self.weapon_menu(player)
@@ -452,259 +564,285 @@ class Inventory:
                 self.discard_from_full_inventory(player)
 
             elif choice == "6":
+                clear_screen()
                 break
 
             else:
                 print("Invalid choice.")
+                self.pause()
+
+    # =========================
+    # WEAPON MENU
+    # =========================
 
     def weapon_menu(self, player):
 
-        weapons = [
-            i for i in self.items
-            if i.itemType == "Weapon"
-        ]
+        while True:
 
-        print("\n=== WEAPONS ===")
-
-        if not weapons:
-            print("No weapons available.")
-            return
-
-        for i, weapon in enumerate(weapons, 1):
-
-            equipped_text = ""
-
-            if weapon == self.weapon:
-                equipped_text = " [EQUIPPED]"
-
-            print(
-                f"{i}. {weapon.name} "
-                f"(+{weapon.value} ATK)"
-                f"{equipped_text}"
-            )
-
-        print(f"{len(weapons) + 1}. Exit")
-
-        choice = input("Choose weapon: ").strip()
-        clear_screen()
-
-        if choice == str(len(weapons) + 1):
-            return
-
-        try:
-
-            weapon = weapons[int(choice) - 1]
-
-            print(f"\nSelected: {weapon.name}")
-            print("1. Equip")
-            print("2. Discard")
-            print("3. Cancel")
-
-            action = input("Choose: ").strip()
             clear_screen()
 
-            if action == "1":
-                self.equip_item(weapon, player)
+            weapons = [
+                item for item in self.items
+                if item.itemType == "Weapon"
+            ]
 
-            elif action == "2":
-                self.discard_item(weapon, player)
+            self.line()
+            print("               WEAPONS")
+            self.line()
 
-            elif action == "3":
+            print(f"Current Weapon: {self.slot_display(self.weapon)}")
+            self.small_line()
+
+            if not weapons:
+
+                print("No weapons available.")
+                self.pause()
                 return
 
-            else:
+            for i, weapon in enumerate(weapons, 1):
+
+                equipped_text = ""
+
+                if weapon == self.weapon:
+                    equipped_text = " [EQUIPPED]"
+
+                print(
+                    f"{i}. {weapon.name:<25} "
+                    f"ATK +{weapon.value:<3}"
+                    f"{equipped_text}"
+                )
+
+            print(f"{len(weapons) + 1}. Back")
+
+            choice = input("\nChoose weapon: ").strip()
+
+            if choice == str(len(weapons) + 1):
+                return
+
+            try:
+
+                weapon = weapons[int(choice) - 1]
+
+            except (ValueError, IndexError):
+
                 print("Invalid choice.")
+                self.pause()
+                continue
 
-        except (ValueError, IndexError):
+            self.selected_item_menu(weapon, player)
 
-            print("Invalid choice.")
+    # =========================
+    # ARMOR MENU
+    # =========================
 
     def armor_menu(self, player):
 
-        print("\n=== ARMOR ===")
-        print("1. Helmet")
-        print("2. Chestplate")
-        print("3. Leggings")
-        print("4. Shield")
-        print("5. Discard Armor")
-        print("6. Exit")
+        while True:
 
-        slot = input("Choose: ").strip()
-        clear_screen()
-
-        if slot == "6":
-            return
-
-        if slot == "5":
-            self.discard_armor_menu(player)
-            return
-
-        slot_map = {
-            "1": "helmet",
-            "2": "chestplate",
-            "3": "leggings",
-            "4": "shield"
-        }
-
-        if slot not in slot_map:
-            print("Invalid slot.")
-            return
-
-        slot_name = slot_map[slot]
-        current = getattr(self, slot_name)
-
-        armors = [
-            i for i in self.items
-            if i.itemType == "Armor"
-            and i.slot == slot_name
-        ]
-
-        print(f"\nCurrent: {current.name if current else 'Empty'}")
-
-        if not armors:
-            print("No armor available for this slot.")
-            return
-
-        for i, armor in enumerate(armors, 1):
-
-            equipped_text = ""
-
-            if self.is_equipped(armor):
-                equipped_text = " [EQUIPPED]"
-
-            print(
-                f"{i}. {armor.name} "
-                f"(+{armor.value} DEF)"
-                f"{equipped_text}"
-            )
-
-        print(f"{len(armors) + 1}. Exit")
-
-        choice = input("Choose armor: ").strip()
-        clear_screen()
-
-        if choice == str(len(armors) + 1):
-            return
-
-        try:
-
-            armor = armors[int(choice) - 1]
-
-            print(f"\nSelected: {armor.name}")
-            print("1. Equip")
-            print("2. Discard")
-            print("3. Cancel")
-
-            action = input("Choose: ").strip()
             clear_screen()
 
-            if action == "1":
-                self.equip_item(armor, player)
+            self.line()
+            print("                ARMOR")
+            self.line()
 
-            elif action == "2":
-                self.discard_item(armor, player)
+            print(f"Helmet     : {self.slot_display(self.helmet)}")
+            print(f"Chestplate : {self.slot_display(self.chestplate)}")
+            print(f"Leggings   : {self.slot_display(self.leggings)}")
+            print(f"Shield     : {self.slot_display(self.shield)}")
 
-            elif action == "3":
+            self.small_line()
+            print("1. Helmet")
+            print("2. Chestplate")
+            print("3. Leggings")
+            print("4. Shield")
+            print("5. Discard Armor")
+            print("6. Back")
+            self.line()
+
+            slot = input("Choose: ").strip()
+
+            if slot == "6":
                 return
 
-            else:
+            if slot == "5":
+                self.discard_armor_menu(player)
+                continue
+
+            slot_map = {
+                "1": "helmet",
+                "2": "chestplate",
+                "3": "leggings",
+                "4": "shield"
+            }
+
+            if slot not in slot_map:
+
+                print("Invalid slot.")
+                self.pause()
+                continue
+
+            self.armor_slot_menu(
+                player,
+                slot_map[slot]
+            )
+
+    def armor_slot_menu(self, player, slot_name):
+
+        while True:
+
+            clear_screen()
+
+            current = getattr(self, slot_name)
+
+            armors = [
+                item for item in self.items
+                if item.itemType == "Armor"
+                and item.slot == slot_name
+            ]
+
+            self.line()
+            print(f"              {slot_name.upper()}")
+            self.line()
+
+            print(f"Current: {self.slot_display(current)}")
+            self.small_line()
+
+            if not armors:
+
+                print("No armor available for this slot.")
+                self.pause()
+                return
+
+            for i, armor in enumerate(armors, 1):
+
+                equipped_text = ""
+
+                if self.is_equipped(armor):
+                    equipped_text = " [EQUIPPED]"
+
+                print(
+                    f"{i}. {armor.name:<25} "
+                    f"DEF +{armor.value:<3}"
+                    f"{equipped_text}"
+                )
+
+            print(f"{len(armors) + 1}. Back")
+
+            choice = input("\nChoose armor: ").strip()
+
+            if choice == str(len(armors) + 1):
+                return
+
+            try:
+
+                armor = armors[int(choice) - 1]
+
+            except (ValueError, IndexError):
+
                 print("Invalid choice.")
+                self.pause()
+                continue
 
-        except (ValueError, IndexError):
-
-            print("Invalid choice.")
+            self.selected_item_menu(armor, player)
 
     def discard_armor_menu(self, player):
 
-        armors = [
-            i for i in self.items
-            if i.itemType == "Armor"
-        ]
+        while True:
 
-        print("\n=== DISCARD ARMOR ===")
+            clear_screen()
 
-        if not armors:
-            print("No armor available.")
-            return
+            armors = [
+                item for item in self.items
+                if item.itemType == "Armor"
+            ]
 
-        for i, armor in enumerate(armors, 1):
+            self.line()
+            print("            DISCARD ARMOR")
+            self.line()
 
-            equipped_text = ""
+            if not armors:
 
-            if self.is_equipped(armor):
-                equipped_text = " [EQUIPPED]"
+                print("No armor available.")
+                self.pause()
+                return
 
-            print(
-                f"{i}. {armor.name} "
-                f"(+{armor.value} DEF)"
-                f"{equipped_text}"
-            )
+            for i, armor in enumerate(armors, 1):
 
-        print(f"{len(armors) + 1}. Exit")
+                equipped_text = ""
 
-        choice = input("Choose armor to discard: ").strip()
-        clear_screen()
+                if self.is_equipped(armor):
+                    equipped_text = " [EQUIPPED]"
 
-        if choice == str(len(armors) + 1):
-            return
+                print(
+                    f"{i}. {armor.name:<25} "
+                    f"DEF +{armor.value:<3}"
+                    f"{equipped_text}"
+                )
 
-        try:
+            print(f"{len(armors) + 1}. Back")
 
-            armor = armors[int(choice) - 1]
-            self.discard_item(armor, player)
+            choice = input("\nChoose armor to discard: ").strip()
 
-        except (ValueError, IndexError):
+            if choice == str(len(armors) + 1):
+                return
 
-            print("Invalid choice.")
+            try:
+
+                armor = armors[int(choice) - 1]
+                clear_screen()
+                self.discard_item(armor, player)
+                self.pause()
+                return
+
+            except (ValueError, IndexError):
+
+                print("Invalid choice.")
+                self.pause()
+
+    # =========================
+    # ITEM MENU
+    # =========================
 
     def item_menu(self, player):
 
-        items = [
-            i for i in self.items
-            if i.itemType == "Consumable"
-        ]
+        while True:
 
-        print("\n=== ITEMS ===")
-
-        if not items:
-            print("No items available.")
-            return
-
-        for i, item in enumerate(items, 1):
-            print(f"{i}. {item.name}")
-
-        print(f"{len(items) + 1}. Exit")
-
-        choice = input("Choose item: ").strip()
-        clear_screen()
-
-        if choice == str(len(items) + 1):
-            return
-
-        try:
-
-            item = items[int(choice) - 1]
-
-            print(f"\nSelected: {item.name}")
-            print("1. Use")
-            print("2. Discard")
-            print("3. Cancel")
-
-            action = input("Choose: ").strip()
             clear_screen()
 
-            if action == "1":
-                self.use_item(item, player)
+            items = [
+                item for item in self.items
+                if item.itemType == "Consumable"
+            ]
 
-            elif action == "2":
-                self.discard_item(item, player)
+            self.line()
+            print("                ITEMS")
+            self.line()
 
-            elif action == "3":
+            if not items:
+
+                print("No usable items available.")
+                self.pause()
                 return
 
-            else:
+            for i, item in enumerate(items, 1):
+
+                print(f"{i}. {item.get_info()}")
+
+            print(f"{len(items) + 1}. Back")
+
+            choice = input("\nChoose item: ").strip()
+
+            if choice == str(len(items) + 1):
+                return
+
+            try:
+
+                item = items[int(choice) - 1]
+
+            except (ValueError, IndexError):
+
                 print("Invalid choice.")
+                self.pause()
+                continue
 
-        except (ValueError, IndexError):
-
-            print("Invalid choice.")
+            self.selected_item_menu(item, player)

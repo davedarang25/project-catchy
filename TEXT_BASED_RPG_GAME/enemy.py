@@ -2,6 +2,30 @@ import random
 
 from .character import Character
 
+from .item import (
+    random_drop,
+    SLIME_DROPS,
+    GOBLIN_DROPS,
+    SKELETON_DROPS,
+    BAT_DROPS,
+    SPIDER_DROPS,
+    WOLF_DROPS,
+    ZOMBIE_DROPS,
+    ORC_DROPS,
+    DARK_MAGE_DROPS,
+    BANDIT_DROPS,
+    GIANT_RAT_DROPS,
+    TROLL_DROPS,
+    WRAITH_DROPS,
+    LIZARDMAN_DROPS,
+    HARPY_DROPS,
+    GOBLIN_KING_DROPS,
+    SKELETON_LORD_DROPS,
+    SLIME_MONARCH_DROPS,
+    ORC_WARLORD_DROPS,
+    ANCIENT_WRAITH_DROPS
+)
+
 
 ENEMY_MODS = {
     "Slime": {
@@ -50,6 +74,78 @@ ENEMY_MODS = {
         "defense_bonus": 0,
         "exp_bonus": 12,
         "gold_bonus": 5
+    },
+
+    "Zombie": {
+        "hp_bonus": 25,
+        "attack_bonus": 1,
+        "defense_bonus": 2,
+        "exp_bonus": 10,
+        "gold_bonus": 4
+    },
+
+    "Orc": {
+        "hp_bonus": 30,
+        "attack_bonus": 6,
+        "defense_bonus": 2,
+        "exp_bonus": 18,
+        "gold_bonus": 10
+    },
+
+    "Dark Mage": {
+        "hp_bonus": -5,
+        "attack_bonus": 8,
+        "defense_bonus": -1,
+        "exp_bonus": 20,
+        "gold_bonus": 12
+    },
+
+    "Bandit": {
+        "hp_bonus": 5,
+        "attack_bonus": 4,
+        "defense_bonus": 1,
+        "exp_bonus": 12,
+        "gold_bonus": 15
+    },
+
+    "Giant Rat": {
+        "hp_bonus": -12,
+        "attack_bonus": 2,
+        "defense_bonus": -1,
+        "exp_bonus": 6,
+        "gold_bonus": 2
+    },
+
+    "Troll": {
+        "hp_bonus": 45,
+        "attack_bonus": 5,
+        "defense_bonus": 4,
+        "exp_bonus": 25,
+        "gold_bonus": 12
+    },
+
+    "Wraith": {
+        "hp_bonus": -5,
+        "attack_bonus": 7,
+        "defense_bonus": 3,
+        "exp_bonus": 22,
+        "gold_bonus": 10
+    },
+
+    "Lizardman": {
+        "hp_bonus": 18,
+        "attack_bonus": 4,
+        "defense_bonus": 3,
+        "exp_bonus": 16,
+        "gold_bonus": 8
+    },
+
+    "Harpy": {
+        "hp_bonus": -8,
+        "attack_bonus": 6,
+        "defense_bonus": 0,
+        "exp_bonus": 17,
+        "gold_bonus": 9
     }
 }
 
@@ -77,7 +173,48 @@ BOSS_MODS = {
         "defense_bonus": 3,
         "exp_bonus": 30,
         "gold_bonus": 25
+    },
+
+    "Orc Warlord": {
+        "hp_bonus": 45,
+        "attack_bonus": 7,
+        "defense_bonus": 4,
+        "exp_bonus": 45,
+        "gold_bonus": 40
+    },
+
+    "Ancient Wraith": {
+        "hp_bonus": 25,
+        "attack_bonus": 9,
+        "defense_bonus": 5,
+        "exp_bonus": 55,
+        "gold_bonus": 45
     }
+}
+
+
+DROP_TABLES = {
+    "Slime": SLIME_DROPS,
+    "Goblin": GOBLIN_DROPS,
+    "Skeleton": SKELETON_DROPS,
+    "Bat": BAT_DROPS,
+    "Spider": SPIDER_DROPS,
+    "Wolf": WOLF_DROPS,
+    "Zombie": ZOMBIE_DROPS,
+    "Orc": ORC_DROPS,
+    "Dark Mage": DARK_MAGE_DROPS,
+    "Bandit": BANDIT_DROPS,
+    "Giant Rat": GIANT_RAT_DROPS,
+    "Troll": TROLL_DROPS,
+    "Wraith": WRAITH_DROPS,
+    "Lizardman": LIZARDMAN_DROPS,
+    "Harpy": HARPY_DROPS,
+
+    "Goblin King": GOBLIN_KING_DROPS,
+    "Skeleton Lord": SKELETON_LORD_DROPS,
+    "Slime Monarch": SLIME_MONARCH_DROPS,
+    "Orc Warlord": ORC_WARLORD_DROPS,
+    "Ancient Wraith": ANCIENT_WRAITH_DROPS
 }
 
 
@@ -111,23 +248,12 @@ class Enemy(Character):
 
     def drop_item(self):
 
-        from .item import (
-            random_drop,
-            SLIME_DROPS,
-            GOBLIN_DROPS,
-            SKELETON_DROPS
-        )
+        drop_pool = DROP_TABLES.get(self.name)
 
-        if self.name in ["Slime", "Slime Monarch"]:
-            return random_drop(SLIME_DROPS)
+        if not drop_pool:
+            return None
 
-        elif self.name in ["Goblin", "Goblin King", "Bat", "Spider", "Wolf"]:
-            return random_drop(GOBLIN_DROPS)
-
-        elif self.name in ["Skeleton", "Skeleton Lord"]:
-            return random_drop(SKELETON_DROPS)
-
-        return None
+        return random_drop(drop_pool)
 
     def get_info(self):
 

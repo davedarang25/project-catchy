@@ -508,6 +508,225 @@ greater_defense_potion = DefenseBoostPotion(
     "Rare"
 )
 
+poison_dagger = Weapon(
+    36,
+    "Poison Dagger",
+    "A dagger coated with monster venom.",
+    11,
+    "Rare"
+)
+
+orc_axe = Weapon(
+    37,
+    "Orc Axe",
+    "A heavy axe used by orc warriors.",
+    12,
+    "Rare"
+)
+
+dark_staff = Weapon(
+    38,
+    "Dark Staff",
+    "A staff filled with dark magic.",
+    13,
+    "Rare"
+)
+
+bandit_blade = Weapon(
+    39,
+    "Bandit Blade",
+    "A curved blade used by dungeon thieves.",
+    9,
+    "Uncommon"
+)
+
+troll_club = Weapon(
+    40,
+    "Troll Club",
+    "A massive club from a troll.",
+    14,
+    "Rare"
+)
+
+wraith_blade = Weapon(
+    41,
+    "Wraith Blade",
+    "A ghostly blade that feels cold to touch.",
+    15,
+    "Rare"
+)
+
+lizard_spear = Weapon(
+    42,
+    "Lizardman Spear",
+    "A sharp spear used by lizard warriors.",
+    11,
+    "Uncommon"
+)
+
+harpy_claw_blade = Weapon(
+    43,
+    "Harpy Claw Blade",
+    "A blade made from sharpened harpy claws.",
+    10,
+    "Uncommon"
+)
+
+orc_helmet = Armor(
+    44,
+    "Orc Helmet",
+    "A heavy helmet used by orcs.",
+    4,
+    "helmet",
+    "Uncommon"
+)
+
+orc_chestplate = Armor(
+    45,
+    "Orc Chestplate",
+    "Thick armor used by orc fighters.",
+    7,
+    "chestplate",
+    "Rare"
+)
+
+orc_leggings = Armor(
+    46,
+    "Orc Leggings",
+    "Heavy leg armor used by orcs.",
+    4,
+    "leggings",
+    "Uncommon"
+)
+
+dark_robe = Armor(
+    47,
+    "Dark Robe",
+    "A robe worn by dark mages.",
+    5,
+    "chestplate",
+    "Rare"
+)
+
+bandit_hood = Armor(
+    48,
+    "Bandit Hood",
+    "A hood used by quick bandits.",
+    3,
+    "helmet",
+    "Uncommon"
+)
+
+troll_hide_chestplate = Armor(
+    49,
+    "Troll Hide Chestplate",
+    "Thick armor made from troll hide.",
+    9,
+    "chestplate",
+    "Rare"
+)
+
+wraith_cloak = Armor(
+    50,
+    "Wraith Cloak",
+    "A cloak touched by ghostly energy.",
+    6,
+    "chestplate",
+    "Rare"
+)
+
+lizard_scale_chestplate = Armor(
+    51,
+    "Lizard Scale Chestplate",
+    "Armor made from strong lizard scales.",
+    7,
+    "chestplate",
+    "Uncommon"
+)
+
+harpy_feather_leggings = Armor(
+    52,
+    "Harpy Feather Leggings",
+    "Light leggings made from harpy feathers.",
+    4,
+    "leggings",
+    "Uncommon"
+)
+
+mega_potion = HealingItem(
+    53,
+    "Mega Potion",
+    "Restores 120 HP.",
+    120,
+    "Epic"
+)
+
+elixir = HealingItem(
+    54,
+    "Elixir",
+    "Restores 60 HP and feels magical.",
+    60,
+    "Rare"
+)
+
+ancient_potion = HealingItem(
+    55,
+    "Ancient Potion",
+    "A powerful potion from an old dungeon.",
+    150,
+    "Epic"
+)
+
+orc_rage_potion = AttackBoostPotion(
+    56,
+    "Orc Rage Potion",
+    "Boosts attack by 10 for 3 turns.",
+    10,
+    3,
+    "Rare"
+)
+
+shadow_guard_potion = DefenseBoostPotion(
+    57,
+    "Shadow Guard Potion",
+    "Boosts defense by 10 for 3 turns.",
+    10,
+    3,
+    "Rare"
+)
+
+king_potion = HealingItem(
+    58,
+    "King's Potion",
+    "Restores 180 HP.",
+    180,
+    "Epic"
+)
+
+warlord_axe = Weapon(
+    59,
+    "Warlord Axe",
+    "A brutal axe once carried by an orc warlord.",
+    18,
+    "Epic"
+)
+
+ancient_wraith_blade = Weapon(
+    60,
+    "Ancient Wraith Blade",
+    "A terrifying blade from an ancient spirit.",
+    20,
+    "Epic"
+)
+
+monarch_core = Armor(
+    61,
+    "Slime Monarch Core",
+    "A strange defensive core from the Slime Monarch.",
+    10,
+    "shield",
+    "Epic"
+)
 
 cloth_armor = cloth_chestplate
 leather_armor = leather_chestplate
@@ -552,6 +771,7 @@ BAT_DROPS = [
 SPIDER_DROPS = [
     medium_potion,
     spider_fang_blade,
+    poison_dagger,
     defense_potion,
     attack_potion
 ]
@@ -563,11 +783,83 @@ WOLF_DROPS = [
     minor_defense_potion
 ]
 
+ZOMBIE_DROPS = [
+    bread,
+    small_potion,
+    bone_helmet,
+    bone_chestplate,
+    minor_defense_potion
+]
+
+ORC_DROPS = [
+    orc_axe,
+    orc_helmet,
+    orc_chestplate,
+    orc_leggings,
+    meat,
+    orc_rage_potion,
+    attack_potion
+]
+
+DARK_MAGE_DROPS = [
+    dark_staff,
+    dark_robe,
+    elixir,
+    greater_attack_potion,
+    shadow_guard_potion
+]
+
+BANDIT_DROPS = [
+    bandit_blade,
+    bandit_hood,
+    medium_potion,
+    minor_attack_potion,
+    attack_potion
+]
+
+GIANT_RAT_DROPS = [
+    bread,
+    small_potion,
+    meat,
+    minor_attack_potion
+]
+
+TROLL_DROPS = [
+    troll_club,
+    troll_hide_chestplate,
+    meat,
+    large_potion,
+    greater_defense_potion
+]
+
+WRAITH_DROPS = [
+    wraith_blade,
+    wraith_cloak,
+    elixir,
+    shadow_guard_potion,
+    greater_attack_potion
+]
+
+LIZARDMAN_DROPS = [
+    lizard_spear,
+    lizard_scale_chestplate,
+    medium_potion,
+    defense_potion
+]
+
+HARPY_DROPS = [
+    harpy_claw_blade,
+    harpy_feather_leggings,
+    small_potion,
+    minor_attack_potion
+]
+
 GOBLIN_KING_DROPS = [
     steel_sword,
     royal_guard_armor,
     greater_attack_potion,
-    large_potion
+    large_potion,
+    king_potion
 ]
 
 SKELETON_LORD_DROPS = [
@@ -576,13 +868,31 @@ SKELETON_LORD_DROPS = [
     bone_chestplate,
     bone_leggings,
     greater_defense_potion,
-    large_potion
+    large_potion,
+    ancient_potion
 ]
 
 SLIME_MONARCH_DROPS = [
     large_potion,
     greater_defense_potion,
-    greater_attack_potion
+    greater_attack_potion,
+    monarch_core
+]
+
+ORC_WARLORD_DROPS = [
+    warlord_axe,
+    orc_chestplate,
+    orc_rage_potion,
+    king_potion,
+    mega_potion
+]
+
+ANCIENT_WRAITH_DROPS = [
+    ancient_wraith_blade,
+    wraith_cloak,
+    shadow_guard_potion,
+    ancient_potion,
+    elixir
 ]
 
 

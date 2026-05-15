@@ -1,5 +1,11 @@
 def show_menu():
+
     print(r"""
+=============================================================
+                    EXILED BELOW
+              A Text-Based Roguelike RPG
+=============================================================
+
  _____________________________________________
 |.'',                                     ,''.|
 |.'.'',                                 ,''.'.|
@@ -21,14 +27,19 @@ def show_menu():
 |.','          /%%%%%%%%%%%%%%%\          ','.|
 |;____________/%%%%%%%%%%%%%%%%%\____________;|
 
-       "Your only goal is to keep moving."
+            "Your only goal is to keep moving."
+
+=============================================================
+                         MAIN MENU
+=============================================================
+
+    [1] Start Game
+    [2] Leaderboard
+    [3] Exit
+
+=============================================================
 """)
 
-    print("\n=== Main Menu ===")
-    print("1. Start Game")
-    print("2. Leaderboard")
-    print("3. Exit")
-
-    choice = input("Enter your choice: ").strip()
+    choice = input("Choose an option: ").strip()
 
     return choice
