@@ -53,10 +53,24 @@ class Player(Character):
 
     def get_exp_info(self):
 
+        needed = self.required_exp_to_level() - self.exp
+
+        if needed < 0:
+            needed = 0
+
         return (
             f"{self.exp}/"
-            f"{self.required_exp_to_level()}"
+            f"{self.required_exp_to_level()} "
+            f"| Needed: {needed}"
         )
+
+    def gain_exp(self, amount):
+
+        self.exp += amount
+
+        print(f"Gained {amount} EXP.")
+
+        self.check_level_up()
 
     def check_level_up(self):
 
@@ -85,79 +99,171 @@ class Player(Character):
             print("+2 Defense")
             print("HP fully restored.")
 
+    def add_starting_equipment(self, equipment_list):
 
-PLAYER_CLASSES = {
+        for item_template in equipment_list:
 
-    "Rogue": {
-        "hp": 80,
-        "attack": 15,
-        "defense": 3,
-        "extra_stats": {
-            "crit_rate": 0.2,
-            "dodge": 0.15
-        },
-        "equipment": [
+            item = copy.deepcopy(item_template)
+
+            added = self.inventory.add_item(
+                item,
+                self
+            )
+
+            if added:
+                self.inventory.equip_item(
+                    item,
+                    self
+                )
+
+    def special_attack(self, target):
+
+        damage = max(
+            1,
+            (self.attack * 2) - target.defense
+        )
+
+        target.take_damage(damage)
+
+        print(
+            f"{self.name} uses Special Attack "
+            f"on {target.name} for {damage} damage!"
+        )
+
+
+class Rogue(Player):
+
+    def __init__(self, name="Rogue"):
+
+        super().__init__(
+            name=name,
+            hp=80,
+            attack=15,
+            defense=3
+        )
+
+        self.crit_rate = 0.2
+        self.dodge = 0.15
+
+        self.add_starting_equipment([
             rusty_dagger,
             cloth_helmet,
             cloth_chestplate,
             cloth_leggings
-        ]
-    },
+        ])
 
-    "Warrior": {
-        "hp": 120,
-        "attack": 12,
-        "defense": 8,
-        "extra_stats": {
-            "strength": 5,
-            "rage": 0
-        },
-        "equipment": [
+    def special_attack(self, target):
+
+        damage = max(
+            1,
+            int((self.attack * 2.5) - target.defense)
+        )
+
+        target.take_damage(damage)
+
+        print(
+            f"{self.name} uses Shadow Strike "
+            f"on {target.name} for {damage} damage!"
+        )
+
+
+class Warrior(Player):
+
+    def __init__(self, name="Warrior"):
+
+        super().__init__(
+            name=name,
+            hp=120,
+            attack=12,
+            defense=8
+        )
+
+        self.strength = 5
+        self.rage = 0
+
+        self.add_starting_equipment([
             wooden_sword,
             leather_helmet,
             leather_chestplate,
             leather_leggings
-        ]
-    },
+        ])
 
-    "Knight": {
-        "hp": 150,
-        "attack": 10,
-        "defense": 12,
-        "extra_stats": {
-            "shield_block": 0.25,
-            "endurance": 10
-        },
-        "equipment": [
+    def special_attack(self, target):
+
+        damage = max(
+            1,
+            int(((self.attack + self.strength) * 2) - target.defense)
+        )
+
+        target.take_damage(damage)
+
+        self.rage += 10
+
+        print(
+            f"{self.name} uses Crushing Slash "
+            f"on {target.name} for {damage} damage!"
+        )
+
+        print(
+            f"{self.name}'s rage increased to "
+            f"{self.rage}."
+        )
+
+
+class Knight(Player):
+
+    def __init__(self, name="Knight"):
+
+        super().__init__(
+            name=name,
+            hp=150,
+            attack=10,
+            defense=12
+        )
+
+        self.shield_block = 0.25
+        self.endurance = 10
+
+        self.add_starting_equipment([
             wooden_sword,
             leather_helmet,
             leather_chestplate,
             leather_leggings,
             wooden_shield
-        ]
-    }
-}
+        ])
+
+    def special_attack(self, target):
+
+        damage = max(
+            1,
+            int((self.attack * 1.8) + self.defense - target.defense)
+        )
+
+        target.take_damage(damage)
+
+        self.defense += 2
+
+        print(
+            f"{self.name} uses Shield Breaker "
+            f"on {target.name} for {damage} damage!"
+        )
+
+        print(
+            f"{self.name} gains +2 DEF."
+        )
 
 
 def create_player(class_name):
 
-    data = PLAYER_CLASSES[class_name]
+    player_classes = {
+        "Rogue": Rogue,
+        "Warrior": Warrior,
+        "Knight": Knight
+    }
 
-    player = Player(
-        name=class_name,
-        hp=data["hp"],
-        attack=data["attack"],
-        defense=data["defense"]
-    )
+    if class_name not in player_classes:
 
-    for stat_name, stat_value in data["extra_stats"].items():
-        setattr(player, stat_name, stat_value)
+        print("Invalid class. Defaulting to Rogue.")
+        return Rogue()
 
-    for item_template in data["equipment"]:
-
-        item = copy.deepcopy(item_template)
-
-        player.inventory.add_item(item, player)
-        player.inventory.equip_item(item, player)
-
-    return player
+    return player_classes[class_name]()
