@@ -11,6 +11,7 @@ from .combat import TurnBasedCombat
 from .events import RandomEvents
 from .logger import Logger
 from .utils import clear_screen
+from .leaderboard import save_score
 
 
 logger = Logger(delay=0.02)
@@ -113,11 +114,20 @@ def explore_dungeon(player):
 
             confirm = input("Are you sure? (YES/NO): ").strip().upper()
 
+            clear_screen()
+
             if confirm == "YES":
+
                 logger.loading("Ending run")
+
+                save_score(player)
+
                 print("GAME OVER")
+                print("Your score has been saved.")
+
                 return False
 
+            print("Surrender cancelled.")
             continue
 
         if choice in ["1", "2", "3"]:
@@ -148,6 +158,11 @@ def explore_dungeon(player):
             result = encounter(player)
 
             if result == "dead":
+
+                save_score(player)
+
+                print("Your score has been saved.")
+
                 return False
 
             player.path_level += 1
