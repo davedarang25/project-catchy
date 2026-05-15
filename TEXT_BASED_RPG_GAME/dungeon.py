@@ -11,7 +11,7 @@ from .combat import TurnBasedCombat
 from .events import RandomEvents
 from .logger import Logger
 from .utils import clear_screen
-from .leaderboard import save_score
+from .leaderboard import save_score, calculate_score
 
 
 logger = Logger(delay=0.02)
@@ -73,6 +73,72 @@ def create_random_boss(player):
     )
 
 
+def get_required_exp(player):
+
+    if hasattr(player, "required_exp_to_level"):
+        return player.required_exp_to_level()
+
+    return 100 + ((player.level - 1) * 50)
+
+
+def show_player_status(player):
+
+    required_exp = get_required_exp(player)
+
+    print(f"HP: {player.hp}/{player.max_hp}")
+    print(f"Gold: {player.gold}")
+    print(f"Level: {player.level}")
+    print(f"EXP: {player.exp}/{required_exp}")
+
+
+def show_game_over_screen(player, reason):
+
+    clear_screen()
+
+    total_score = calculate_score(player)
+
+    path_score = player.path_level * 100
+    level_score = player.level * 50
+    exp_score = player.exp
+    gold_score = player.gold * 2
+
+    print("\n" + "=" * 40)
+    print("              GAME OVER")
+    print("=" * 40)
+
+    print(f"\nReason: {reason}")
+
+    print("\n" + "-" * 40)
+    print("              RUN SUMMARY")
+    print("-" * 40)
+
+    print(f"Class        : {player.name}")
+    print(f"Path Reached : {player.path_level}")
+    print(f"Level        : {player.level}")
+    print(f"EXP          : {player.exp}")
+    print(f"Gold         : {player.gold}")
+
+    print("\n" + "-" * 40)
+    print("              SCORE")
+    print("-" * 40)
+
+    print(f"Path Score   : {path_score}")
+    print(f"Level Score  : {level_score}")
+    print(f"EXP Score    : {exp_score}")
+    print(f"Gold Score   : {gold_score}")
+
+    print("\n" + "=" * 40)
+    print(f"TOTAL SCORE  : {total_score}")
+    print("=" * 40)
+
+    save_score(player)
+
+    print("\nYour score has been saved.")
+
+    input("\nPress Enter to return to Main Menu...")
+    clear_screen()
+
+
 def explore_dungeon(player):
 
     if not hasattr(player, "path_level"):
@@ -86,10 +152,7 @@ def explore_dungeon(player):
         print(f"        PATH {player.path_level}")
         print("=" * 30)
 
-        print(f"HP: {player.hp}/{player.max_hp}")
-        print(f"Gold: {player.gold}")
-        print(f"EXP: {player.get_exp_info()}")
-        print(f"Level: {player.level}")
+        show_player_status(player)
 
         print("\nAvailable Paths:")
 
@@ -120,10 +183,10 @@ def explore_dungeon(player):
 
                 logger.loading("Ending run")
 
-                save_score(player)
-
-                print("GAME OVER")
-                print("Your score has been saved.")
+                show_game_over_screen(
+                    player,
+                    "You surrendered."
+                )
 
                 return False
 
@@ -159,9 +222,10 @@ def explore_dungeon(player):
 
             if result == "dead":
 
-                save_score(player)
-
-                print("Your score has been saved.")
+                show_game_over_screen(
+                    player,
+                    "You were defeated."
+                )
 
                 return False
 
@@ -238,9 +302,6 @@ def encounter(player):
         RandomEvents().trigger_event(player)
 
         if not player.is_alive():
-
-            print("\nYou died from the event.")
-            print("GAME OVER")
 
             return "dead"
 
