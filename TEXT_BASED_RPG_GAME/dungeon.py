@@ -470,6 +470,9 @@ def encounter(player):
         logger.log("Boss combat begins.")
         logger.display_buffer()
 
+        input("\nPress Enter to enter combat...")
+        clear_screen()
+
         combat = TurnBasedCombat(
             player,
             boss
@@ -497,6 +500,9 @@ def encounter(player):
 
         logger.log("Combat begins.")
         logger.display_buffer()
+
+        input("\nPress Enter to enter combat...")
+        clear_screen()
 
         combat = TurnBasedCombat(
             player,

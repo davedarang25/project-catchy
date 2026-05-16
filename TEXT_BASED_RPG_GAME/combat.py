@@ -4,6 +4,7 @@ from .utils import clear_screen
 
 logger = Logger(delay=0.02)
 
+
 class TurnBasedCombat:
 
     def __init__(self, player, enemy):
@@ -16,9 +17,136 @@ class TurnBasedCombat:
         self.player_guard = False
         self.enemy_guard = False
 
+        # Special attack cooldown
+        # 0 means ready
+        self.special_cooldown = 0
+
+    # =========================
+    # UI HELPERS
+    # =========================
+
+    def hp_bar(self, current, maximum, length=20):
+
+        if maximum <= 0:
+            maximum = 1
+
+        filled = int((current / maximum) * length)
+
+        if filled < 0:
+            filled = 0
+
+        if filled > length:
+            filled = length
+
+        empty = length - filled
+
+        return "[" + ("█" * filled) + (" " * empty) + "]"
+
+    def special_ready(self):
+
+        return self.special_cooldown == 0
+
+    def turns_until_special(self):
+
+        return self.special_cooldown
+
+    def advance_player_turn(self, used_special=False):
+
+        if used_special:
+
+            self.special_cooldown = 3
+
+        else:
+
+            if self.special_cooldown > 0:
+                self.special_cooldown -= 1
+
+    def show_combat_ui(self):
+
+        print("\n" + "=" * 55)
+        print("                     COMBAT")
+        print("=" * 55)
+
+        print(
+            f"\n{self.player.name} "
+            f"(Lv {self.player.level})"
+        )
+
+        print(
+            f"HP  : {self.player.hp}/{self.player.max_hp} "
+            f"{self.hp_bar(self.player.hp, self.player.max_hp)}"
+        )
+
+        print(
+            f"ATK : {self.player.attack} | "
+            f"DEF : {self.player.defense}"
+        )
+
+        print(f"EXP : {self.player.get_exp_info()}")
+
+        if self.player_guard:
+            print("STATUS: Guarding")
+
+        if getattr(self.player, "attack_boost_turns", 0) > 0:
+            print(
+                f"ATK BOOST: +{self.player.temp_attack_bonus} "
+                f"({self.player.attack_boost_turns} turns)"
+            )
+
+        if getattr(self.player, "defense_boost_turns", 0) > 0:
+            print(
+                f"DEF BOOST: +{self.player.temp_defense_bonus} "
+                f"({self.player.defense_boost_turns} turns)"
+            )
+
+        print("\n" + "-" * 55)
+
+        print(
+            f"\n{self.enemy.name} "
+            f"(Lv {self.enemy.level})"
+        )
+
+        print(
+            f"HP  : {self.enemy.hp}/{self.enemy.max_hp} "
+            f"{self.hp_bar(self.enemy.hp, self.enemy.max_hp)}"
+        )
+
+        print(
+            f"ATK : {self.enemy.attack} | "
+            f"DEF : {self.enemy.defense}"
+        )
+
+        if self.enemy_guard:
+            print("STATUS: Guarding")
+
+        print("=" * 55)
+
+    def show_action_menu(self):
+
+        print("\nChoose Action:")
+        print("1. Attack")
+        print("2. Use Item")
+        print("3. Defend")
+
+        if self.special_ready():
+            print("4. Special Attack [READY]")
+        else:
+            print(
+                f"4. Special Attack "
+                f"[Cooldown: {self.turns_until_special()} turn(s)]"
+            )
+
+    # =========================
+    # COMBAT MAIN LOOP
+    # =========================
+
     def start_combat(self):
 
-        print(f"\nA {self.enemy.name} appears!")
+        clear_screen()
+
+        print("\n" + "=" * 55)
+        print(f"A {self.enemy.name} appears!")
+        print("=" * 55)
 
         while not self.check_combat_end():
 
@@ -29,6 +157,10 @@ class TurnBasedCombat:
                 self.enemy_turn()
 
         return self.end_combat()
+
+    # =========================
+    # HIT CHECK
+    # =========================
 
     def check_hit(self, attacker, defender):
 
@@ -42,28 +174,29 @@ class TurnBasedCombat:
 
         return random.random() <= hit_chance
 
+    # =========================
+    # PLAYER TURN
+    # =========================
+
     def player_turn(self):
 
         while True:
 
             print("\n--- Player Turn ---")
 
-            print(self.player.get_info())
-            print(f"EXP: {self.player.get_exp_info()}")
-            print(self.enemy.get_info())
+            self.show_combat_ui()
+            self.show_action_menu()
 
-            print("\nChoose Action:")
-            print("1. Attack")
-            print("2. Use Item")
-            print("3. Defend")
-            print("4. Special Attack")
-
-            choice = input("Enter choice: ").strip()
+            choice = input("\nEnter choice: ").strip()
             clear_screen()
+
             if choice == "1":
 
                 self.player_attack()
+
                 self.current_turn = "Enemy"
+                self.advance_player_turn()
+
                 break
 
             elif choice == "2":
@@ -71,7 +204,10 @@ class TurnBasedCombat:
                 used_item = self.use_item()
 
                 if used_item:
+
                     self.current_turn = "Enemy"
+                    self.advance_player_turn()
+
                     break
 
             elif choice == "3":
@@ -84,22 +220,42 @@ class TurnBasedCombat:
                 )
 
                 self.current_turn = "Enemy"
+                self.advance_player_turn()
+
                 break
+
             elif choice == "4":
+
+                if not self.special_ready():
+
+                    print(
+                        f"Special Attack is still on cooldown. "
+                        f"{self.turns_until_special()} turn(s) remaining."
+                    )
+
+                    continue
 
                 if hasattr(self.player, "special_attack"):
 
                     if self.check_hit(self.player, self.enemy):
+
                         self.player.special_attack(self.enemy)
+
                     else:
+
                         logger.typewriter(
                             f"{self.player.name}'s special attack missed!"
                         )
 
                 else:
+
                     logger.typewriter("No special attack available.")
+
                 self.current_turn = "Enemy"
+                self.advance_player_turn(used_special=True)
+
                 break
+
             else:
 
                 print("Invalid choice. Try again.")
@@ -130,6 +286,10 @@ class TurnBasedCombat:
 
         self.enemy_guard = False
 
+    # =========================
+    # ENEMY TURN
+    # =========================
+
     def enemy_turn(self):
 
         print("\n--- Enemy Turn ---")
@@ -155,6 +315,7 @@ class TurnBasedCombat:
                     self.player.defense += 5
 
                 if hasattr(self.enemy, "attack_target"):
+
                     self.enemy.attack_target(self.player)
 
                 else:
@@ -185,6 +346,10 @@ class TurnBasedCombat:
 
         self.current_turn = "Player"
 
+    # =========================
+    # ITEMS
+    # =========================
+
     def use_item(self):
 
         consumables = [
@@ -197,12 +362,15 @@ class TurnBasedCombat:
             print("No usable items.")
             return False
 
-        print("\n=== CONSUMABLES ===")
+        print("\n" + "=" * 45)
+        print("                 ITEMS")
+        print("=" * 45)
 
         for i, item in enumerate(consumables, 1):
             print(f"{i}. {item.name}")
 
         print(f"{len(consumables) + 1}. Cancel")
+        print("=" * 45)
 
         try:
 
@@ -210,7 +378,10 @@ class TurnBasedCombat:
                 input("Choose item number: ")
             )
 
+            clear_screen()
+
             if choice == len(consumables) + 1:
+
                 print("Cancelled.")
                 return False
 
@@ -225,6 +396,10 @@ class TurnBasedCombat:
 
             print("Invalid item choice.")
             return False
+
+    # =========================
+    # TEMPORARY BUFFS
+    # =========================
 
     def update_temporary_buffs(self):
 
@@ -272,6 +447,10 @@ class TurnBasedCombat:
                 self.player.temp_defense_bonus = 0
                 self.player.defense_boost_turns = 0
 
+    # =========================
+    # COMBAT END
+    # =========================
+
     def check_combat_end(self):
 
         return (
@@ -293,31 +472,31 @@ class TurnBasedCombat:
 
         if self.player.is_alive():
 
+            print("\n" + "=" * 45)
+            print("                 VICTORY")
+            print("=" * 45)
+
             print(
-                f"\n{self.player.name} defeated "
+                f"{self.player.name} defeated "
                 f"{self.enemy.name}!"
             )
 
+            print("\nRewards")
+            print("-" * 45)
+
             self.player.exp += self.enemy.exp_reward
 
-            print(
-                f"Gained {self.enemy.exp_reward} EXP."
-            )
+            print(f"EXP Gained  : {self.enemy.exp_reward}")
 
             self.player.gold += self.enemy.gold_reward
 
-            print(
-                f"Gained {self.enemy.gold_reward} gold."
-            )
+            print(f"Gold Gained : {self.enemy.gold_reward}")
 
             dropped_item = self.enemy.drop_item()
 
             if dropped_item:
 
-                print(
-                    f"{self.enemy.name} dropped "
-                    f"{dropped_item.name}!"
-                )
+                print(f"Item Drop   : {dropped_item.name}")
 
                 item_added = self.player.inventory.add_item(
                     dropped_item,
@@ -330,11 +509,35 @@ class TurnBasedCombat:
                         f"{dropped_item.name} was left behind."
                     )
 
+            else:
+
+                print("Item Drop   : None")
+
+            print("-" * 45)
+
             self.level_up_check()
 
-            print(f"EXP: {self.player.get_exp_info()}")
+            print("\nCurrent Status")
+            print("-" * 45)
+            print(f"HP   : {self.player.hp}/{self.player.max_hp}")
+            print(f"ATK  : {self.player.attack}")
+            print(f"DEF  : {self.player.defense}")
+            print(f"Gold : {self.player.gold}")
+            print(f"EXP  : {self.player.get_exp_info()}")
+            print("=" * 45)
+
+            input("\nPress Enter to continue...")
+            clear_screen()
 
             return "win"
 
+        print("\n" + "=" * 45)
+        print("                 DEFEAT")
+        print("=" * 45)
+
         print("\nYou were defeated. Game Over.")
+
+        input("\nPress Enter to continue...")
+        clear_screen()
+
         return "dead"
