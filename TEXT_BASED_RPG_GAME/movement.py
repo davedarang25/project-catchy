@@ -10,6 +10,11 @@ class MovementCycle:
         self.current_path = 1
         self.current_location = "Dungeon Entrance"
 
+        # This keeps Floor 1, 2, 3, 4, 5 as numbers,
+        # but the floor section/theme is randomized every run.
+        self.floor_order = [1, 2, 3, 4, 5]
+        random.shuffle(self.floor_order)
+
         self.floor_names = {
             1: "Upper Ruins",
             2: "Rotten Depths",
@@ -156,6 +161,10 @@ class MovementCycle:
 
         return ((total_path - 1) % 10) + 1
 
+    def get_floor_key(self):
+
+        return self.floor_order[self.current_floor - 1]
+
     def sync_with_player_path(self, total_path, player=None):
 
         old_floor = self.current_floor
@@ -166,9 +175,12 @@ class MovementCycle:
         floor_changed = self.current_floor != old_floor
 
         if floor_changed:
-            self.current_location = self.floor_entrances[self.current_floor]
+
+            floor_key = self.get_floor_key()
+            self.current_location = self.floor_entrances[floor_key]
 
         if player:
+
             player.current_floor = self.current_floor
             player.current_path = self.current_path
             player.current_location = self.current_location
@@ -182,18 +194,23 @@ class MovementCycle:
             player
         )
 
-        room_list = self.rooms[self.current_floor][path_name]
+        floor_key = self.get_floor_key()
+
+        room_list = self.rooms[floor_key][path_name]
 
         self.current_location = random.choice(room_list)
 
         if player:
+
             player.current_floor = self.current_floor
             player.current_path = self.current_path
             player.current_location = self.current_location
 
     def get_floor_name(self):
 
-        return self.floor_names[self.current_floor]
+        floor_key = self.get_floor_key()
+
+        return self.floor_names[floor_key]
 
     def get_room_flavor(self):
 
@@ -215,6 +232,8 @@ class MovementCycle:
             "Burned Library": "Ash and torn pages cover the floor.",
             "Forgotten Barracks": "Rotten beds and broken armor remain.",
 
+            "Rotten Depths Entrance": "A foul smell rises from below.",
+
             "Rotten Tunnel": "The smell of decay fills the air.",
             "Molded Cellar": "The walls are wet and covered in mold.",
             "Bone-Filled Passage": "Bones crack beneath your steps.",
@@ -229,6 +248,8 @@ class MovementCycle:
             "Spider Den": "Sticky webs cover the walls.",
             "Abandoned Kitchen": "Broken tools and old bones remain.",
             "Cursed Workshop": "Strange tools lie on blood-marked tables.",
+
+            "Blood Hall Gate": "A red-stained gate opens before you.",
 
             "Blood-Stained Corridor": "The stones are dark with old blood.",
             "Execution Chamber": "A rusted blade hangs above a broken platform.",
@@ -245,6 +266,8 @@ class MovementCycle:
             "Weapon Storage": "Old weapons are stacked against the wall.",
             "Hidden Supply Chamber": "Someone once hid supplies here.",
 
+            "Abyssal Keep Entrance": "A cold gate leads into a darker section.",
+
             "Shadow Prison": "The shadows seem to move by themselves.",
             "Void-Touched Hall": "The air feels thin and cold.",
             "Fallen Knight Room": "A dead knight's armor rests against the wall.",
@@ -259,6 +282,8 @@ class MovementCycle:
             "Wraith Library": "Ghostly whispers drift between shelves.",
             "Forgotten Treasury": "Gold dust glimmers under broken stone.",
             "War Beast Den": "Deep claw marks cover the floor.",
+
+            "Emperor's Descent Gate": "A massive gate marks the final descent.",
 
             "Final Prison Wing": "The cells are sealed with old iron.",
             "Hall of Broken Crowns": "Broken crowns lie scattered like trash.",
