@@ -12,6 +12,7 @@ from .events import RandomEvents
 from .logger import Logger
 from .utils import clear_screen
 from .leaderboard import save_score, calculate_score
+from .movement import MovementCycle
 
 
 logger = Logger(delay=0.02)
@@ -91,6 +92,13 @@ def show_player_status(player):
     print(f"EXP: {player.exp}/{required_exp}")
 
 
+def show_location_status(player):
+
+    print(f"Floor: {player.current_floor}")
+    print(f"Path : {player.current_path}/10")
+    print(f"Room : {player.current_location}")
+
+
 def show_game_over_screen(player, reason):
 
     clear_screen()
@@ -114,6 +122,16 @@ def show_game_over_screen(player, reason):
 
     print(f"Class        : {player.name}")
     print(f"Path Reached : {player.path_level}")
+
+    if hasattr(player, "current_floor"):
+        print(f"Floor        : {player.current_floor}")
+
+    if hasattr(player, "current_path"):
+        print(f"Current Path : {player.current_path}/10")
+
+    if hasattr(player, "current_location"):
+        print(f"Room         : {player.current_location}")
+
     print(f"Level        : {player.level}")
     print(f"EXP          : {player.exp}")
     print(f"Gold         : {player.gold}")
@@ -139,18 +157,42 @@ def show_game_over_screen(player, reason):
     clear_screen()
 
 
+def setup_movement(player):
+
+    if not hasattr(player, "movement"):
+        player.movement = MovementCycle()
+
+    player.movement.sync_with_player_path(
+        player.path_level,
+        player
+    )
+
+
 def explore_dungeon(player):
 
     if not hasattr(player, "path_level"):
         player.path_level = 1
 
+    setup_movement(player)
+
+    movement = player.movement
+
     path_states = generate_path_states()
 
     while True:
 
+        movement.sync_with_player_path(
+            player.path_level,
+            player
+        )
+
         print("\n" + "=" * 30)
-        print(f"        PATH {player.path_level}")
+        print("        DUNGEON PATH")
         print("=" * 30)
+
+        show_location_status(player)
+
+        print("\n" + "-" * 30)
 
         show_player_status(player)
 
@@ -205,13 +247,32 @@ def explore_dungeon(player):
 
                 continue
 
-            logger.log(
-                f"\n{player.name} enters "
-                f"the {selected} path..."
+            movement.move_path(
+                selected,
+                player.path_level,
+                player
             )
 
             logger.log(
-                "The darkness shifts around you."
+                f"\n{player.name} enters the "
+                f"{selected} path..."
+            )
+
+            logger.log(
+                f"Floor {player.current_floor} - "
+                f"{movement.get_floor_name()}"
+            )
+
+            logger.log(
+                f"Path {player.current_path}/10"
+            )
+
+            logger.log(
+                f"Room: {player.current_location}"
+            )
+
+            logger.log(
+                movement.get_room_flavor()
             )
 
             logger.display_buffer()
@@ -231,6 +292,29 @@ def explore_dungeon(player):
 
             player.path_level += 1
 
+            floor_changed = movement.sync_with_player_path(
+                player.path_level,
+                player
+            )
+
+            if floor_changed:
+
+                logger.log("\nThe dungeon shifts violently.")
+                logger.log(
+                    f"You descend into Floor "
+                    f"{player.current_floor}."
+                )
+
+                logger.log(
+                    f"Section: {movement.get_floor_name()}"
+                )
+
+                logger.log(
+                    f"Path reset to {player.current_path}/10."
+                )
+
+                logger.display_buffer()
+
             path_states = generate_path_states()
 
             continue
@@ -240,7 +324,7 @@ def explore_dungeon(player):
 
 def encounter(player):
 
-    if player.path_level % 10 == 0:
+    if player.current_path == 10:
 
         boss = create_random_boss(player)
 
@@ -304,6 +388,7 @@ def encounter(player):
         if not player.is_alive():
 
             return "dead"
+
         logger.loading("")
         clear_screen()
         return "continue"
