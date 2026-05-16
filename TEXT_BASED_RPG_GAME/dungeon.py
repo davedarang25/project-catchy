@@ -69,6 +69,33 @@ def wait_for_event():
     clear_screen()
 
 
+def ask_leaderboard_name():
+
+    while True:
+
+        name = input(
+            "\nEnter name for leaderboard "
+            "(max 10 letters): "
+        ).strip()
+
+        if not name:
+
+            print("Name cannot be empty.")
+            continue
+
+        if len(name) > 10:
+
+            print("Name must be 10 letters or less.")
+            continue
+
+        if not name.isalpha():
+
+            print("Use letters only.")
+            continue
+
+        return name
+
+
 # ==============================
 # PATH GENERATION
 # ==============================
@@ -254,9 +281,17 @@ def show_game_over_screen(player, reason):
     print(f"TOTAL SCORE  : {total_score}")
     line(60)
 
-    save_score(player)
+    leaderboard_name = ask_leaderboard_name()
 
-    print("\nYour score has been saved.")
+    save_score(
+        player,
+        leaderboard_name
+    )
+
+    print(
+        f"\nYour score has been saved as "
+        f"{leaderboard_name}."
+    )
 
     input("\nPress Enter to return to Main Menu...")
     clear_screen()
@@ -316,18 +351,10 @@ def explore_dungeon(player):
         choice = input("Choose path or command: ").strip().upper()
         clear_screen()
 
-        # ==============================
-        # INVENTORY
-        # ==============================
-
         if choice == "BAG":
 
             player.inventory.inventory_menu(player)
             continue
-
-        # ==============================
-        # SURRENDER
-        # ==============================
 
         if choice == "SURRENDER":
 
@@ -350,10 +377,6 @@ def explore_dungeon(player):
 
             print("Surrender cancelled.")
             continue
-
-        # ==============================
-        # PATH SELECTION
-        # ==============================
 
         if choice in ["1", "2", "3"]:
 

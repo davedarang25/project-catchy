@@ -1,11 +1,2 @@
-Warrior|410|3|1|10|25
-Warrior|1727|11|3|47|215
-Knight|250|2|1|0|0
-Warrior|770|6|1|40|40
-Warrior|1711|11|3|39|211
-Warrior|260|2|1|10|0
-Warrior|250|2|1|0|0
-Rogue|311|2|1|25|18
-Warrior|1983|11|3|175|279
-Warrior|1002|8|2|2|50
-Rogue|150|1|1|0|0
+Kuro|Warrior|1174|7|1|82|171
+Test|Knight|150|1|1|0|0
