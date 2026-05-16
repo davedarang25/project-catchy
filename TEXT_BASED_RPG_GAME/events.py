@@ -29,6 +29,48 @@ class RandomEvents:
                 "description": "The room is empty. Nothing happens.",
                 "effect": "none",
                 "value": 0
+            },
+            {
+                "name": "Ancient Shrine",
+                "description": "You found an ancient shrine glowing faintly.",
+                "effect": "heal",
+                "value": 35
+            },
+            {
+                "name": "Lost Coin Pouch",
+                "description": "You found a pouch filled with old dungeon coins.",
+                "effect": "gold",
+                "value": 40
+            },
+            {
+                "name": "Poison Gas",
+                "description": "A cloud of poison gas bursts from the walls!",
+                "effect": "damage",
+                "value": 20
+            },
+            {
+                "name": "Blessed Statue",
+                "description": "A cracked statue releases a warm light.",
+                "effect": "heal",
+                "value": 45
+            },
+            {
+                "name": "Cursed Floor",
+                "description": "Dark symbols glow beneath your feet and burn you.",
+                "effect": "damage",
+                "value": 30
+            },
+            {
+                "name": "Forgotten Treasure Box",
+                "description": "You find a small treasure box hidden behind loose stones.",
+                "effect": "gold",
+                "value": 60
+            },
+            {
+                "name": "Cursed Altar",
+                "description": "You find a cursed altar with a black flame burning on top.",
+                "effect": "choice",
+                "value": 0
             }
         ]
 
@@ -68,6 +110,10 @@ class RandomEvents:
 
             print(f"You gained {event['value']} gold.")
 
+        elif event["effect"] == "choice":
+
+            self.cursed_altar_choice(player)
+
         else:
 
             print("Nothing happened.")
@@ -80,3 +126,60 @@ class RandomEvents:
 
         if hasattr(player, "check_level_up"):
             player.check_level_up()
+
+    def cursed_altar_choice(self, player):
+
+        print("\nThe altar whispers to you...")
+        print("A voice offers you power, but demands a price.")
+
+        print("\nChoose your action:")
+        print("1. Touch the black flame")
+        print("2. Walk away from the altar")
+
+        choice = input("Choose: ").strip()
+
+        if choice == "1":
+
+            damage = 25
+            gold_reward = 75
+            exp_reward = 25
+
+            print("\nYou touch the black flame.")
+            print("Power rushes through your body, but it burns your soul.")
+
+            player.take_damage(damage)
+            player.gold += gold_reward
+            player.exp += exp_reward
+
+            print(f"You took {damage} damage.")
+            print(f"You gained {gold_reward} gold.")
+            print(f"You gained {exp_reward} bonus EXP.")
+
+        elif choice == "2":
+
+            heal_amount = 15
+
+            old_hp = player.hp
+
+            player.hp = min(
+                player.max_hp,
+                player.hp + heal_amount
+            )
+
+            healed = player.hp - old_hp
+
+            print("\nYou step away from the altar.")
+            print("The black flame fades, leaving behind a small warmth.")
+
+            print(f"You restored {healed} HP.")
+
+        else:
+
+            damage = 10
+
+            print("\nYou hesitated too long.")
+            print("The altar punishes your indecision.")
+
+            player.take_damage(damage)
+
+            print(f"You took {damage} damage.")

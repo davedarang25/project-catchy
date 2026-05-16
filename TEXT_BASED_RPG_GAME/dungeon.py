@@ -18,6 +18,61 @@ from .movement import MovementCycle
 logger = Logger(delay=0.02)
 
 
+# ==============================
+# UI HELPERS
+# ==============================
+
+def line(length=52):
+    print("=" * length)
+
+
+def small_line(length=52):
+    print("-" * length)
+
+
+def hp_bar(current, maximum, length=18):
+
+    if maximum <= 0:
+        maximum = 1
+
+    filled = int((current / maximum) * length)
+
+    if filled < 0:
+        filled = 0
+
+    if filled > length:
+        filled = length
+
+    empty = length - filled
+
+    return "[" + ("█" * filled) + (" " * empty) + "]"
+
+
+def show_header(title):
+
+    line()
+    print(title.center(52))
+    line()
+
+
+def show_subheader(title):
+
+    print()
+    small_line()
+    print(title.center(52))
+    small_line()
+
+
+def wait_for_event():
+
+    input("\nPress Enter to continue...")
+    clear_screen()
+
+
+# ==============================
+# PATH GENERATION
+# ==============================
+
 def generate_path_states():
 
     path_states = {
@@ -39,6 +94,10 @@ def generate_path_states():
 
     return path_states
 
+
+# ==============================
+# ENEMY CREATION
+# ==============================
 
 def create_random_enemy(player):
 
@@ -74,6 +133,10 @@ def create_random_boss(player):
     )
 
 
+# ==============================
+# PLAYER DISPLAY
+# ==============================
+
 def get_required_exp(player):
 
     if hasattr(player, "required_exp_to_level"):
@@ -86,18 +149,58 @@ def show_player_status(player):
 
     required_exp = get_required_exp(player)
 
-    print(f"HP: {player.hp}/{player.max_hp}")
-    print(f"Gold: {player.gold}")
-    print(f"Level: {player.level}")
-    print(f"EXP: {player.exp}/{required_exp}")
+    show_subheader("PLAYER STATUS")
+
+    print(f"Class : {player.name}")
+    print(
+        f"HP    : {player.hp}/{player.max_hp} "
+        f"{hp_bar(player.hp, player.max_hp)}"
+    )
+    print(f"Level : {player.level}")
+    print(f"EXP   : {player.exp}/{required_exp}")
+    print(f"Gold  : {player.gold}")
 
 
-def show_location_status(player):
+def show_location_status(player, movement):
 
-    print(f"Floor: {player.current_floor}")
-    print(f"Path : {player.current_path}/10")
-    print(f"Room : {player.current_location}")
+    show_subheader("CURRENT LOCATION")
 
+    print(f"Floor : {player.current_floor} - {movement.get_floor_name()}")
+    print(f"Path  : {player.current_path}/10")
+    print(f"Room  : {player.current_location}")
+
+
+def show_paths(path_states):
+
+    show_subheader("AVAILABLE PATHS")
+
+    path_names = list(path_states.keys())
+
+    for i, path in enumerate(path_names, 1):
+
+        state = path_states[path]
+
+        if state == "OPEN":
+            marker = "OPEN"
+        else:
+            marker = "BLOCKED"
+
+        print(f"[{i}] {path:<8} : {marker}")
+
+    return path_names
+
+
+def show_commands():
+
+    show_subheader("COMMANDS")
+
+    print("[BAG]        Open Inventory")
+    print("[SURRENDER]  End Run")
+
+
+# ==============================
+# GAME OVER SCREEN
+# ==============================
 
 def show_game_over_screen(player, reason):
 
@@ -110,15 +213,16 @@ def show_game_over_screen(player, reason):
     exp_score = player.exp
     gold_score = player.gold * 2
 
-    print("\n" + "=" * 40)
-    print("              GAME OVER")
-    print("=" * 40)
+    line(60)
+    print("GAME OVER".center(60))
+    line(60)
 
     print(f"\nReason: {reason}")
 
-    print("\n" + "-" * 40)
-    print("              RUN SUMMARY")
-    print("-" * 40)
+    print()
+    small_line(60)
+    print("RUN SUMMARY".center(60))
+    small_line(60)
 
     print(f"Class        : {player.name}")
     print(f"Path Reached : {player.path_level}")
@@ -136,18 +240,19 @@ def show_game_over_screen(player, reason):
     print(f"EXP          : {player.exp}")
     print(f"Gold         : {player.gold}")
 
-    print("\n" + "-" * 40)
-    print("              SCORE")
-    print("-" * 40)
+    print()
+    small_line(60)
+    print("SCORE BREAKDOWN".center(60))
+    small_line(60)
 
     print(f"Path Score   : {path_score}")
     print(f"Level Score  : {level_score}")
     print(f"EXP Score    : {exp_score}")
     print(f"Gold Score   : {gold_score}")
 
-    print("\n" + "=" * 40)
+    line(60)
     print(f"TOTAL SCORE  : {total_score}")
-    print("=" * 40)
+    line(60)
 
     save_score(player)
 
@@ -156,6 +261,10 @@ def show_game_over_screen(player, reason):
     input("\nPress Enter to return to Main Menu...")
     clear_screen()
 
+
+# ==============================
+# MOVEMENT SETUP
+# ==============================
 
 def setup_movement(player):
 
@@ -167,6 +276,10 @@ def setup_movement(player):
         player
     )
 
+
+# ==============================
+# DUNGEON EXPLORATION
+# ==============================
 
 def explore_dungeon(player):
 
@@ -186,36 +299,39 @@ def explore_dungeon(player):
             player
         )
 
-        print("\n" + "=" * 30)
-        print("        DUNGEON PATH")
-        print("=" * 30)
+        show_header("DUNGEON EXPLORATION")
 
-        show_location_status(player)
-
-        print("\n" + "-" * 30)
+        show_location_status(
+            player,
+            movement
+        )
 
         show_player_status(player)
 
-        print("\nAvailable Paths:")
+        path_names = show_paths(path_states)
 
-        path_names = list(path_states.keys())
+        show_commands()
 
-        for i, path in enumerate(path_names, 1):
-            print(f"{i}. {path} [{path_states[path]}]")
-
-        print("\nBAG = Inventory")
-        print("SURRENDER = Quit Run")
-
-        choice = input("\nChoose path (1-3): ").strip().upper()
-
+        line()
+        choice = input("Choose path or command: ").strip().upper()
         clear_screen()
+
+        # ==============================
+        # INVENTORY
+        # ==============================
 
         if choice == "BAG":
 
             player.inventory.inventory_menu(player)
             continue
 
+        # ==============================
+        # SURRENDER
+        # ==============================
+
         if choice == "SURRENDER":
+
+            show_header("SURRENDER RUN")
 
             confirm = input("Are you sure? (YES/NO): ").strip().upper()
 
@@ -235,11 +351,17 @@ def explore_dungeon(player):
             print("Surrender cancelled.")
             continue
 
+        # ==============================
+        # PATH SELECTION
+        # ==============================
+
         if choice in ["1", "2", "3"]:
 
             selected = path_names[int(choice) - 1]
 
             if path_states[selected] == "BLOCKED":
+
+                show_header("BLOCKED PATH")
 
                 logger.typewriter(
                     f"The {selected} path is blocked."
@@ -299,7 +421,9 @@ def explore_dungeon(player):
 
             if floor_changed:
 
-                logger.log("\nThe dungeon shifts violently.")
+                show_header("NEW FLOOR")
+
+                logger.log("The dungeon shifts violently.")
                 logger.log(
                     f"You descend into Floor "
                     f"{player.current_floor}."
@@ -319,8 +443,13 @@ def explore_dungeon(player):
 
             continue
 
-        print("Invalid input.")
+        show_header("INVALID INPUT")
+        print("Please choose 1, 2, 3, BAG, or SURRENDER.")
 
+
+# ==============================
+# ENCOUNTERS
+# ==============================
 
 def encounter(player):
 
@@ -328,7 +457,9 @@ def encounter(player):
 
         boss = create_random_boss(player)
 
-        logger.log("\nThe dungeon trembles...")
+        show_header("BOSS ENCOUNTER")
+
+        logger.log("The dungeon trembles...")
         logger.log("A powerful enemy blocks your path!")
 
         logger.log(
@@ -357,8 +488,10 @@ def encounter(player):
 
         enemy = create_random_enemy(player)
 
+        show_header("ENEMY ENCOUNTER")
+
         logger.log(
-            f"\nA {enemy.name} "
+            f"A {enemy.name} "
             f"(Lv {enemy.level}) appears!"
         )
 
@@ -379,24 +512,28 @@ def encounter(player):
 
     elif roll < 0.7:
 
-        logger.log("\nSomething unusual happens...")
+        show_header("RANDOM EVENT")
+
+        logger.log("Something unusual happens...")
         logger.log("A random event has been triggered.")
         logger.display_buffer()
 
         RandomEvents().trigger_event(player)
 
         if not player.is_alive():
-
             return "dead"
 
-        logger.loading("")
-        clear_screen()
+        wait_for_event()
+
         return "continue"
 
     else:
+
+        show_header("EMPTY AREA")
 
         logger.loading("Searching the area")
         print("Nothing happens...")
         logger.loading("")
         clear_screen()
+
         return "continue"
