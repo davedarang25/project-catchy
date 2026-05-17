@@ -1,4 +1,5 @@
 import random
+from abc import abstractmethod
 
 from .character import Character
 
@@ -242,9 +243,37 @@ class Enemy(Character):
             defense
         )
 
-        self.exp_reward = exp_reward
-        self.gold_reward = gold_reward
-        self.enemy_type = enemy_type
+        self._exp_reward = exp_reward
+        self._gold_reward = gold_reward
+        self._enemy_type = enemy_type
+
+    # =========================
+    # ENCAPSULATED PROPERTIES
+    # =========================
+
+    @property
+    def exp_reward(self):
+        return self._exp_reward
+
+    @exp_reward.setter
+    def exp_reward(self, value):
+        self._exp_reward = max(0, value)
+
+    @property
+    def gold_reward(self):
+        return self._gold_reward
+
+    @gold_reward.setter
+    def gold_reward(self, value):
+        self._gold_reward = max(0, value)
+
+    @property
+    def enemy_type(self):
+        return self._enemy_type
+
+    # =========================
+    # ENEMY METHODS
+    # =========================
 
     def drop_item(self):
 
@@ -265,6 +294,14 @@ class Enemy(Character):
             f"ATK: {self.attack} | "
             f"DEF: {self.defense}"
         )
+
+    # =========================
+    # ABSTRACTION
+    # =========================
+
+    @abstractmethod
+    def attack_target(self, target):
+        pass
 
 
 class OrdinaryEnemy(Enemy):
@@ -376,8 +413,27 @@ class BossEnemy(Enemy):
             enemy_type="Boss"
         )
 
-        self.phase = phase
-        self.special_chance = 0.30
+        self._phase = phase
+        self._special_chance = 0.30
+
+    @property
+    def phase(self):
+        return self._phase
+
+    @phase.setter
+    def phase(self, value):
+        self._phase = max(1, value)
+
+    @property
+    def special_chance(self):
+        return self._special_chance
+
+    @special_chance.setter
+    def special_chance(self, value):
+        self._special_chance = max(
+            0,
+            min(value, 1)
+        )
 
     def normal_attack(self, target):
 

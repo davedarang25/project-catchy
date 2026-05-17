@@ -1,4 +1,5 @@
 import copy
+from abc import abstractmethod
 
 from .character import Character
 from .inventory import Inventory
@@ -38,17 +39,85 @@ class Player(Character):
             defense=defense
         )
 
-        self.inventory = Inventory()
+        self._inventory = Inventory()
 
-        self.exp = 0
-        self.gold = 0
-        self.path_level = 1
+        self._exp = 0
+        self._gold = 0
+        self._path_level = 1
 
-        self.temp_attack_bonus = 0
-        self.attack_boost_turns = 0
+        self._temp_attack_bonus = 0
+        self._attack_boost_turns = 0
 
-        self.temp_defense_bonus = 0
-        self.defense_boost_turns = 0
+        self._temp_defense_bonus = 0
+        self._defense_boost_turns = 0
+
+    # =========================
+    # ENCAPSULATED PROPERTIES
+    # =========================
+
+    @property
+    def inventory(self):
+        return self._inventory
+
+    @property
+    def exp(self):
+        return self._exp
+
+    @exp.setter
+    def exp(self, value):
+        self._exp = max(0, value)
+
+    @property
+    def gold(self):
+        return self._gold
+
+    @gold.setter
+    def gold(self, value):
+        self._gold = max(0, value)
+
+    @property
+    def path_level(self):
+        return self._path_level
+
+    @path_level.setter
+    def path_level(self, value):
+        self._path_level = max(1, value)
+
+    @property
+    def temp_attack_bonus(self):
+        return self._temp_attack_bonus
+
+    @temp_attack_bonus.setter
+    def temp_attack_bonus(self, value):
+        self._temp_attack_bonus = max(0, value)
+
+    @property
+    def attack_boost_turns(self):
+        return self._attack_boost_turns
+
+    @attack_boost_turns.setter
+    def attack_boost_turns(self, value):
+        self._attack_boost_turns = max(0, value)
+
+    @property
+    def temp_defense_bonus(self):
+        return self._temp_defense_bonus
+
+    @temp_defense_bonus.setter
+    def temp_defense_bonus(self, value):
+        self._temp_defense_bonus = max(0, value)
+
+    @property
+    def defense_boost_turns(self):
+        return self._defense_boost_turns
+
+    @defense_boost_turns.setter
+    def defense_boost_turns(self, value):
+        self._defense_boost_turns = max(0, value)
+
+    # =========================
+    # PLAYER METHODS
+    # =========================
 
     def required_exp_to_level(self):
 
@@ -119,19 +188,28 @@ class Player(Character):
                     self
                 )
 
-    def special_attack(self, target):
+    def attack_target(self, target):
 
         damage = max(
             1,
-            (self.attack * 2) - target.defense
+            self.attack - target.defense
         )
 
         target.take_damage(damage)
 
         print(
-            f"{self.name} uses Special Attack "
-            f"on {target.name} for {damage} damage!"
+            f"{self.name} attacks "
+            f"{target.name} for "
+            f"{damage} damage!"
         )
+
+    # =========================
+    # ABSTRACTION
+    # =========================
+
+    @abstractmethod
+    def special_attack(self, target):
+        pass
 
 
 class Rogue(Player):
@@ -145,8 +223,8 @@ class Rogue(Player):
             defense=3
         )
 
-        self.crit_rate = 0.2
-        self.dodge = 0.15
+        self._crit_rate = 0.2
+        self._dodge = 0.15
 
         self.add_starting_equipment([
             rusty_dagger,
@@ -155,7 +233,24 @@ class Rogue(Player):
             cloth_leggings
         ])
 
+    @property
+    def crit_rate(self):
+        return self._crit_rate
+
+    @crit_rate.setter
+    def crit_rate(self, value):
+        self._crit_rate = max(0, value)
+
+    @property
+    def dodge(self):
+        return self._dodge
+
+    @dodge.setter
+    def dodge(self, value):
+        self._dodge = max(0, value)
+
     def special_attack(self, enemy):
+
         damage = self.attack * 2
         enemy.take_damage(damage)
 
@@ -176,8 +271,8 @@ class Warrior(Player):
             defense=8
         )
 
-        self.strength = 5
-        self.rage = 0
+        self._strength = 5
+        self._rage = 0
 
         self.add_starting_equipment([
             wooden_sword,
@@ -186,7 +281,24 @@ class Warrior(Player):
             leather_leggings
         ])
 
+    @property
+    def strength(self):
+        return self._strength
+
+    @strength.setter
+    def strength(self, value):
+        self._strength = max(0, value)
+
+    @property
+    def rage(self):
+        return self._rage
+
+    @rage.setter
+    def rage(self, value):
+        self._rage = max(0, value)
+
     def special_attack(self, enemy):
+
         damage = self.attack + self.strength
         enemy.take_damage(damage)
 
@@ -209,8 +321,8 @@ class Knight(Player):
             defense=12
         )
 
-        self.shield_block = 0.25
-        self.endurance = 10
+        self._shield_block = 0.25
+        self._endurance = 10
 
         self.add_starting_equipment([
             wooden_sword,
@@ -220,8 +332,29 @@ class Knight(Player):
             wooden_shield
         ])
 
+    @property
+    def shield_block(self):
+        return self._shield_block
+
+    @shield_block.setter
+    def shield_block(self, value):
+        self._shield_block = max(0, value)
+
+    @property
+    def endurance(self):
+        return self._endurance
+
+    @endurance.setter
+    def endurance(self, value):
+        self._endurance = max(0, value)
+
     def special_attack(self, enemy):
-        damage = max(1, self.attack - enemy.defense)
+
+        damage = max(
+            1,
+            self.attack - enemy.defense
+        )
+
         enemy.take_damage(damage)
 
         self.defense += 1
