@@ -42,5 +42,16 @@
         "level": 2,
         "exp": 168,
         "gold": 248
+    },
+    {
+        "name": "ets",
+        "class": "Knight",
+        "score": 1897,
+        "path_reached": 11,
+        "floor": 2,
+        "path_number": 1,
+        "level": 3,
+        "exp": 45,
+        "gold": 301
     }
 ]
