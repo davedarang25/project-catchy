@@ -1,7 +1,9 @@
+import json
+
 from .utils import clear_screen
 
 
-SCORE_FILE = "leaderboard.txt"
+SCORE_FILE = "leaderboard.json"
 
 
 def calculate_score(player):
@@ -33,113 +35,41 @@ def save_score(player, player_name=None):
     floor_number = getattr(player, "current_floor", 1)
     path_number = getattr(player, "current_path", player.path_level)
 
-    with open(SCORE_FILE, "a") as file:
-        file.write(
-            f"{player_name}|"
-            f"{class_name}|"
-            f"{score}|"
-            f"{player.path_level}|"
-            f"{floor_number}|"
-            f"{path_number}|"
-            f"{player.level}|"
-            f"{player.exp}|"
-            f"{player.gold}\n"
-        )
+    new_entry = {
+        "name": player_name,
+        "class": class_name,
+        "score": score,
+        "path_reached": player.path_level,
+        "floor": floor_number,
+        "path_number": path_number,
+        "level": player.level,
+        "exp": player.exp,
+        "gold": player.gold
+    }
+
+    scores = load_scores()
+    scores.append(new_entry)
+
+    with open(SCORE_FILE, "w", encoding="utf-8") as file:
+        json.dump(scores, file, indent=4)
 
 
 def load_scores():
 
-    scores = []
-
     try:
-        with open(SCORE_FILE, "r") as file:
+        with open(SCORE_FILE, "r", encoding="utf-8") as file:
+            scores = json.load(file)
 
-            for line in file:
-                data = line.strip().split("|")
-
-                # New format:
-                # name|class|score|path_reached|floor|path_number|level|exp|gold
-                if len(data) == 9:
-
-                    name = data[0]
-                    class_name = data[1]
-                    score = int(data[2])
-                    path_reached = int(data[3])
-                    floor_number = int(data[4])
-                    path_number = int(data[5])
-                    level = int(data[6])
-                    exp = int(data[7])
-                    gold = int(data[8])
-
-                    scores.append({
-                        "name": name,
-                        "class": class_name,
-                        "score": score,
-                        "path_reached": path_reached,
-                        "floor": floor_number,
-                        "path_number": path_number,
-                        "level": level,
-                        "exp": exp,
-                        "gold": gold
-                    })
-
-                # Old format:
-                # name|class|score|path|level|exp|gold
-                elif len(data) == 7:
-
-                    name = data[0]
-                    class_name = data[1]
-                    score = int(data[2])
-                    path_reached = int(data[3])
-                    level = int(data[4])
-                    exp = int(data[5])
-                    gold = int(data[6])
-
-                    floor_number = ((path_reached - 1) // 10) + 1
-                    path_number = ((path_reached - 1) % 10) + 1
-
-                    scores.append({
-                        "name": name,
-                        "class": class_name,
-                        "score": score,
-                        "path_reached": path_reached,
-                        "floor": floor_number,
-                        "path_number": path_number,
-                        "level": level,
-                        "exp": exp,
-                        "gold": gold
-                    })
-
-                # Older format:
-                # name|score|path|level|exp|gold
-                elif len(data) == 6:
-
-                    name = data[0]
-                    score = int(data[1])
-                    path_reached = int(data[2])
-                    level = int(data[3])
-                    exp = int(data[4])
-                    gold = int(data[5])
-
-                    floor_number = ((path_reached - 1) // 10) + 1
-                    path_number = ((path_reached - 1) % 10) + 1
-
-                    scores.append({
-                        "name": name,
-                        "class": "Unknown",
-                        "score": score,
-                        "path_reached": path_reached,
-                        "floor": floor_number,
-                        "path_number": path_number,
-                        "level": level,
-                        "exp": exp,
-                        "gold": gold
-                    })
+            if isinstance(scores, list):
+                return scores
 
     except FileNotFoundError:
         pass
 
-    return scores
+    except json.JSONDecodeError:
+        pass
+
+    return []
 
 
 def display_scores(scores, show_all=False):

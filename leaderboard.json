@@ -1,0 +1,46 @@
+[
+    {
+        "name": "Kuro",
+        "class": "Warrior",
+        "score": 1174,
+        "path_reached": 7,
+        "floor": 1,
+        "path_number": 7,
+        "level": 1,
+        "exp": 82,
+        "gold": 171
+    },
+    {
+        "name": "Test",
+        "class": "Knight",
+        "score": 150,
+        "path_reached": 1,
+        "floor": 1,
+        "path_number": 1,
+        "level": 1,
+        "exp": 0,
+        "gold": 0
+    },
+    {
+        "name": "TJ",
+        "class": "Knight",
+        "score": 1813,
+        "path_reached": 11,
+        "floor": 2,
+        "path_number": 1,
+        "level": 3,
+        "exp": 57,
+        "gold": 253
+    },
+    {
+        "name": "Ditan",
+        "class": "Rogue",
+        "score": 1864,
+        "path_reached": 11,
+        "floor": 2,
+        "path_number": 1,
+        "level": 2,
+        "exp": 168,
+        "gold": 248
+    }
+]
