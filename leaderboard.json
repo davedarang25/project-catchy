@@ -53,5 +53,16 @@
         "level": 3,
         "exp": 45,
         "gold": 301
+    },
+    {
+        "name": "KT",
+        "class": "Knight",
+        "score": 797,
+        "path_reached": 5,
+        "floor": 1,
+        "path_number": 5,
+        "level": 1,
+        "exp": 85,
+        "gold": 81
     }
 ]
