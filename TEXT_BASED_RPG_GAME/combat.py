@@ -274,7 +274,7 @@ class TurnBasedCombat:
 
             self.enemy.take_damage(damage)
 
-            print(
+            logger.typewriter(
                 f"{self.player.name} hit "
                 f"{self.enemy.name} for "
                 f"{damage} damage!"
@@ -282,7 +282,7 @@ class TurnBasedCombat:
 
         else:
 
-            print(f"{self.player.name}'s attack missed!")
+            logger.typewriter(f"{self.player.name}'s attack missed!")
 
         self.enemy_guard = False
 
@@ -292,7 +292,7 @@ class TurnBasedCombat:
 
     def enemy_turn(self):
 
-        print("\n--- Enemy Turn ---")
+        logger.typewriter("\n--- Enemy Turn ---")
 
         enemy_action = random.choice(
             ["attack", "attack", "attack", "defend"]
@@ -302,7 +302,7 @@ class TurnBasedCombat:
 
             self.enemy_guard = True
 
-            print(
+            logger.typewriter(
                 f"{self.enemy.name} defends "
                 f"and prepares for your next attack."
             )
@@ -327,7 +327,7 @@ class TurnBasedCombat:
 
                     self.player.take_damage(damage)
 
-                    print(
+                    logger.typewriter(
                         f"{self.enemy.name} hit "
                         f"{self.player.name} for "
                         f"{damage} damage!"
@@ -338,7 +338,7 @@ class TurnBasedCombat:
 
             else:
 
-                print(f"{self.enemy.name}'s attack missed!")
+                logger.typewriter(f"{self.enemy.name}'s attack missed!")
 
             self.player_guard = False
 
