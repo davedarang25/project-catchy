@@ -1,2 +1,3 @@
 Kuro|Warrior|1174|7|1|82|171
 Test|Knight|150|1|1|0|0
+TJ|Knight|1813|11|2|1|3|57|253
