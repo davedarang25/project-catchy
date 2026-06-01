@@ -64,5 +64,27 @@
         "level": 1,
         "exp": 85,
         "gold": 81
+    },
+    {
+        "name": "e",
+        "class": "Knight",
+        "score": 301,
+        "path_reached": 2,
+        "floor": 1,
+        "path_number": 2,
+        "level": 1,
+        "exp": 25,
+        "gold": 13
+    },
+    {
+        "name": "ALFRED",
+        "class": "Warrior",
+        "score": 354,
+        "path_reached": 2,
+        "floor": 1,
+        "path_number": 2,
+        "level": 1,
+        "exp": 52,
+        "gold": 26
     }
 ]
